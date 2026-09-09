@@ -21,7 +21,7 @@ class ResultCache:
         self._init_db()
 
     def _init_db(self) -> None:
-        self.conn = sqlite3.connect(str(self.db_path))
+        self.conn = sqlite3.connect(str(self.db_path), check_same_thread=False)
         self.conn.execute(
             """
             CREATE TABLE IF NOT EXISTS cache (
@@ -43,9 +43,7 @@ class ResultCache:
 
     def get(self, plugin: str, target: str) -> dict[str, Any] | None:
         key = self.make_key(plugin, target)
-        row = self.conn.execute(
-            "SELECT result, expires_at FROM cache WHERE key = ?", (key,)
-        ).fetchone()
+        row = self.conn.execute("SELECT result, expires_at FROM cache WHERE key = ?", (key,)).fetchone()
         if row is None:
             return None
         expires = datetime.fromisoformat(row[1])
@@ -90,9 +88,7 @@ class ResultCache:
     def stats(self) -> dict[str, Any]:
         total = self.conn.execute("SELECT COUNT(*) FROM cache").fetchone()[0]
         now = datetime.now(UTC).isoformat()
-        valid = self.conn.execute(
-            "SELECT COUNT(*) FROM cache WHERE expires_at > ?", (now,)
-        ).fetchone()[0]
+        valid = self.conn.execute("SELECT COUNT(*) FROM cache WHERE expires_at > ?", (now,)).fetchone()[0]
         return {"total_entries": total, "valid_entries": valid, "expired_entries": total - valid}
 
     def cleanup(self) -> int:

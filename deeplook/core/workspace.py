@@ -21,8 +21,10 @@ class Workspace:
         self.base_dir = base_dir or Path.home() / ".deeplook" / "workspaces"
         self.base_dir.mkdir(parents=True, exist_ok=True)
         self.db_path = self.base_dir / f"{name}.db"
-        self.conn = sqlite3.connect(str(self.db_path))
+        self.conn = sqlite3.connect(str(self.db_path), check_same_thread=False)
         self.conn.row_factory = sqlite3.Row
+        self.conn.execute("PRAGMA journal_mode=WAL")
+        self.conn.execute("PRAGMA busy_timeout=5000")
         self._init_db()
 
     def _init_db(self) -> None:
@@ -139,9 +141,7 @@ class Workspace:
         return self._row_to_entity(row) if row else None
 
     def find_entity_by_value(self, value: str) -> Entity | None:
-        row = self.conn.execute(
-            "SELECT * FROM entities WHERE LOWER(value) = LOWER(?)", (value,)
-        ).fetchone()
+        row = self.conn.execute("SELECT * FROM entities WHERE LOWER(value) = LOWER(?)", (value,)).fetchone()
         return self._row_to_entity(row) if row else None
 
     def find_entities(self, query: str) -> list[Entity]:
@@ -207,9 +207,7 @@ class Workspace:
 
     def log_scan(self, command: str, targets: list[str], plugin_count: int = 0) -> int:
         cursor = self.conn.execute(
-            "INSERT INTO scan_history "
-            "(command, targets, started_at, plugin_count) "
-            "VALUES (?, ?, ?, ?)",
+            "INSERT INTO scan_history (command, targets, started_at, plugin_count) VALUES (?, ?, ?, ?)",
             (command, json.dumps(targets), datetime.now(UTC).isoformat(), plugin_count),
         )
         self.conn.commit()
