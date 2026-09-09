@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "deeplook"
+version = "1.0.0"
+description = "Advanced terminal OSINT & threat intelligence framework"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.11"
+authors = [
+    {name = "Ritchie Gerona"}
+]
+keywords = ["osint", "threat-intelligence", "recon", "cybersecurity", "ctia"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Information Technology",
+    "Topic :: Security",
+    "Programming Language :: Python :: 3",
+]
+
+dependencies = [
+    "typer>=0.12.0",
+    "rich>=13.0.0",
+    "requests>=2.31.0",
+    "python-whois>=0.9.0",
+    "dnspython>=2.4.0",
+    "stix2>=3.0.0",
+    "networkx>=3.2",
+    "aiohttp>=3.9.0",
+    "beautifulsoup4>=4.12.0",
+    "lxml>=5.1.0",
+    "cryptography>=42.0.0",
+    "openpyxl>=3.1.0",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "pytest-asyncio>=0.23",
+    "ruff>=0.3.0",
+    "responses>=0.24",
+]
+
+[project.scripts]
+deeplook = "deeplook.cli:app"
+
+[tool.setuptools.packages.find]
+include = ["deeplook*"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
