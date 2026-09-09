@@ -5,21 +5,38 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "deeplook"
 version = "1.0.0"
-description = "Advanced terminal OSINT & threat intelligence framework"
+description = "Advanced terminal OSINT & threat intelligence framework for CTIA and security professionals"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.11"
 authors = [
-    {name = "Ritchie Gerona"}
+    {name = "Ritchie Gerona", email = "ritchegerona@users.noreply.github.com"}
 ]
-keywords = ["osint", "threat-intelligence", "recon", "cybersecurity", "ctia"]
+keywords = [
+    "osint",
+    "threat-intelligence",
+    "recon",
+    "cybersecurity",
+    "ctia",
+    "infosec",
+    "security",
+    "investigation",
+    "digital-forensics",
+]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Information Technology",
+    "Intended Audience :: Education",
     "Topic :: Security",
+    "Topic :: System :: Networking",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
 ]
-
 dependencies = [
     "typer>=0.12.0",
     "rich>=13.0.0",
@@ -43,6 +60,12 @@ dev = [
     "ruff>=0.3.0",
     "responses>=0.24",
 ]
+
+[project.urls]
+Homepage = "https://github.com/ritchegerona/DeepLook"
+Documentation = "https://github.com/ritchegerona/DeepLook/tree/main/docs"
+Repository = "https://github.com/ritchegerona/DeepLook"
+Issues = "https://github.com/ritchegerona/DeepLook/issues"
 
 [project.scripts]
 deeplook = "deeplook.cli:app"
