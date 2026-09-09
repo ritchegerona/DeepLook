@@ -68,8 +68,7 @@ Use the `@register_plugin` decorator to register your plugin:
 
 ```python
 @register_plugin
-class MyPlugin(OSINTPlugin):
-    ...
+class MyPlugin(OSINTPlugin): ...
 ```
 
 The plugin will be automatically discovered and loaded by DeepLook.
@@ -157,7 +156,7 @@ result.add_warning("Something unexpected happened")
 
 # Access results
 print(result.entities)  # list[Entity]
-print(result.edges)     # list[Edge]
+print(result.edges)  # list[Edge]
 print(result.warnings)  # list[str]
 print(result.metadata)  # dict[str, Any]
 ```
@@ -220,11 +219,7 @@ Always track where findings came from:
 
 ```python
 # Add provenance to entities
-entity.add_provenance(
-    source=self.name,
-    confidence=0.9,
-    raw_data={"api_response": data}
-)
+entity.add_provenance(source=self.name, confidence=0.9, raw_data={"api_response": data})
 
 # Add provenance to edges
 edge = Edge(
@@ -351,6 +346,32 @@ cp my_plugin.py ~/.deeplook/plugins/
 deeplook plugins --action list
 deeplook plugins --action info --name my-plugin
 ```
+
+---
+
+## Security Plugins
+
+DeepLook includes 12 specialized security plugins for vulnerability assessment and threat detection:
+
+### Breach Detection (`breach-*`)
+- `breach-domain` — Check domain against URLhaus and ThreatFox malicious URL databases
+- `breach-ip` — Check IP against AbuseIPDB and ThreatFox for abuse reports
+- `malware-hash` — Check file hashes against MalwareBazaar malware database
+
+### Vulnerability Scanning (`vuln-*`)
+- `cve-check` — Check for known CVEs affecting the target
+- `ssl-vuln` — Detect SSL/TLS vulnerabilities (Heartbleed, POODLE, etc.)
+- `subdomain-takeover` — Detect subdomains vulnerable to takeover
+
+### Misconfiguration Detection (`misconfig-*`)
+- `dns-security` — Check DNS security (DMARC, SPF, DNSSEC)
+- `header-security` — Analyze HTTP security headers (CSP, HSTS, X-Frame-Options)
+- `email-security` — Validate email authentication records
+
+### Exposure Detection (`exposure-*`)
+- `exposed-services` — Detect exposed admin panels, debug endpoints, and services
+- `sensitive-files` — Check for exposed sensitive files (.env, .git, backups)
+- `api-exposure` — Discover exposed API endpoints
 
 ---
 

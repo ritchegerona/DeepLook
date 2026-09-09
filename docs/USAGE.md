@@ -199,6 +199,58 @@ deeplook website example.com --export xlsx
 
 ---
 
+### `deeplook security <target>`
+
+Security vulnerability and breach assessment.
+
+```bash
+deeplook security <target> [OPTIONS]
+```
+
+**Plugins run:** All 12 security plugins (unless filtered by type)
+
+**Options:**
+| Option | Short | Description | Default |
+|--------|-------|-------------|---------|
+| `--type` | `-t` | Security check type: `breach`, `vuln`, `misconfig`, `exposure` | all |
+| `--workspace` | `-w` | Workspace name | |
+| `--format` | `-f` | Output format: `table`, `json` | `table` |
+| `--export` | | Export format: `json`, `xlsx`, `stix` | |
+| `--output` | | Export file path | |
+| `--no-cache` | | Skip cache | |
+
+**Security Types:**
+- `breach` — Breach detection: `breach-domain`, `breach-ip`, `malware-hash`
+- `vuln` — Vulnerability scanning: `cve-check`, `subdomain-takeover`, `ssl-vuln`
+- `misconfig` — Misconfiguration checks: `dns-security`, `header-security`, `email-security`
+- `exposure` — Exposure detection: `exposed-services`, `sensitive-files`, `api-exposure`
+
+**Security Scoring:**
+The security command produces a weighted score across 6 categories:
+- SSL/TLS Security (20%)
+- DNS Security (20%)
+- Security Headers (20%)
+- Email Security (15%)
+- Exposure Risk (15%)
+- Breach Status (10%)
+
+**Examples:**
+```bash
+# Full security assessment
+deeplook security example.com
+
+# Breach detection only
+deeplook security example.com -t breach
+
+# Vulnerability scan with JSON output
+deeplook security example.com -t vuln -f json
+
+# Export security report
+deeplook security example.com --export xlsx --output security-report.xlsx
+```
+
+---
+
 ## Bulk Operations
 
 ### `deeplook scan`

@@ -18,11 +18,12 @@ DeepLook maps to the **CTIA Intelligence Lifecycle**: it automates the *collecti
 
 ### Core Capabilities
 - **7 entity types**: Domain, IP, Email, Username, Phone, Hash, BTC wallet
-- **26+ plugins**: WHOIS, DNS, geolocation, tech fingerprinting, username enumeration, breach checks, certificate transparency, and more
+- **38+ plugins**: WHOIS, DNS, geolocation, tech fingerprinting, username enumeration, breach checks, certificate transparency, security assessment, and more
 - **Graph visualization**: ASCII/Unicode entity relationship graphs in terminal
 - **Bulk scanning**: Scan hundreds of targets from a file with parallel execution
 - **Deep website profiling**: Tech stack, headers, certificates, emails, subdomains
 - **Cross-target correlation**: Auto-detect shared infrastructure, contacts, technology
+- **Security assessment**: Vulnerability scanning, breach detection, misconfiguration checks
 
 ### Export & Reporting
 - **CSV**: Universal, spreadsheet-compatible
@@ -84,6 +85,15 @@ deeplook username johndoe
 
 # Deep website profiling
 deeplook website example.com
+
+# Security vulnerability and breach assessment
+deeplook security example.com
+
+# Security scan with specific type
+deeplook security example.com -t breach
+deeplook security example.com -t vuln
+deeplook security example.com -t misconfig
+deeplook security example.com -t exposure
 ```
 
 ### Bulk Scanning
@@ -163,6 +173,7 @@ deeplook timeline
 | `deeplook hash <hash>` | File hash lookup | `deeplook hash d41d8cd98f00b204` |
 | `deeplook btc <address>` | Bitcoin wallet check | `deeplook btc 1A1zP1eP5QGefi2DMPTf` |
 | `deeplook website <domain>` | Deep website profiling | `deeplook website example.com` |
+| `deeplook security <target>` | Security vulnerability assessment | `deeplook security example.com` |
 | `deeplook scan -f <file>` | Bulk scan from file | `deeplook scan -f targets.txt` |
 | `deeplook graph` | ASCII entity graph | `deeplook graph --center example.com` |
 | `deeplook correlate` | Cross-target correlation | `deeplook correlate` |
@@ -179,7 +190,7 @@ deeplook timeline
 
 ## Plugin System
 
-### Built-in Plugins (26)
+### Built-in Plugins (38)
 
 | Plugin | Entity Type | Source | Key Required |
 |--------|-------------|--------|--------------|
@@ -209,6 +220,18 @@ deeplook timeline
 | `web-redirects` | Domain | HTTP redirect chain | No |
 | `web-meta` | Domain | HTML meta tags | No |
 | `web-dns-extra` | Domain | CAA/DNSSEC | No |
+| `breach-domain` | Domain | URLhaus/ThreatFox | No |
+| `breach-ip` | IP | AbuseIPDB/ThreatFox | No |
+| `malware-hash` | Hash | MalwareBazaar | No |
+| `cve-check` | Domain/IP | NVD API | No |
+| `ssl-vuln` | Domain | SSL/TLS check | No |
+| `dns-security` | Domain | DNS analysis | No |
+| `header-security` | Domain | HTTP headers | No |
+| `email-security` | Domain | DNS records | No |
+| `subdomain-takeover` | Domain | CNAME check | No |
+| `exposed-services` | Domain/IP | Port/path check | No |
+| `sensitive-files` | Domain | Path probing | No |
+| `api-exposure` | Domain | Endpoint discovery | No |
 
 ### Custom Plugins
 

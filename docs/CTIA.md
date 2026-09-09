@@ -11,9 +11,9 @@ DeepLook automates the **Collection** and **Processing** stages of the Intellige
 | Lifecycle Stage | DeepLook Feature | Commands |
 |-----------------|------------------|----------|
 | **Planning & Direction** | Workspace management, investigation notes | `workspace new`, `note` |
-| **Collection** | 26+ passive OSINT plugins | `domain`, `ip`, `email`, `username`, `website`, `scan` |
+| **Collection** | 38+ passive OSINT plugins | `domain`, `ip`, `email`, `username`, `website`, `scan` |
 | **Processing** | Entity normalization, graph construction, caching | `analyze`, `graph` |
-| **Analysis** | Correlation engine, AI pivot suggestions | `correlate`, `ai pivot`, `query` |
+| **Analysis** | Correlation engine, AI pivot suggestions, security assessment | `correlate`, `ai pivot`, `query`, `security` |
 | **Dissemination** | Export to CSV/Excel/JSON/STIX, report templates | `export`, `ai report` |
 | **Feedback** | Timeline tracking, diff comparison | `timeline`, `diff` |
 
@@ -24,11 +24,12 @@ DeepLook automates the **Collection** and **Processing** stages of the Intellige
 ### Module 1: Introduction to Threat Intelligence
 
 DeepLook provides hands-on practice with:
-- **OSINT collection** via 26+ plugins
+- **OSINT collection** via 38+ plugins
 - **Indicator types**: Domains, IPs, emails, usernames, hashes, BTC wallets
 - **Source validation**: Each result includes provenance tracking
+- **Security assessment**: Vulnerability scanning, breach detection, misconfiguration checks
 
-**Commands:** `analyze`, `domain`, `ip`, `email`, `username`
+**Commands:** `analyze`, `domain`, `ip`, `email`, `username`, `security`
 
 ---
 
