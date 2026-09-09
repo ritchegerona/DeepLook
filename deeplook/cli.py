@@ -20,6 +20,7 @@ from deeplook.output.correlation import correlate
 from deeplook.output.csv_export import export_csv
 from deeplook.output.excel_export import export_xlsx
 from deeplook.output.json_export import export_json
+from deeplook.output.security_report import render_security_json, render_security_report
 from deeplook.output.stix_export import export_stix
 from deeplook.output.table import render_edge_table, render_entity_table
 
@@ -628,6 +629,106 @@ def search_cmd(
     if results["notes"]:
         for note in results["notes"]:
             console.print(f"  [dim]{note['created_at']}[/dim] {note['content']}")
+
+
+@app.command()
+def security(
+    target: str = typer.Argument(help="Target to assess (domain or IP)"),
+    workspace: str = typer.Option(None, "-w", "--workspace"),
+    security_type: str = typer.Option(
+        None, "-t", "--type", help="Security check type: breach, vuln, misconfig, exposure"
+    ),
+    export: str = typer.Option(None, "--export", help="Export format: json, xlsx, stix"),
+    export_path: str = typer.Option(None, "--output", help="Export file path"),
+    output_format: str = typer.Option("table", "-f", "--format", help="Output format: table, json"),
+    no_cache: bool = typer.Option(False, "--no-cache", help="Skip cache"),
+) -> None:
+    """Security vulnerability and breach assessment."""
+    from deeplook.core.security_scorer import Finding, FindingStatus, RiskLevel, SecurityScorer
+
+    ws = get_workspace(workspace)
+    cache = None if no_cache else ResultCache()
+
+    console.print(
+        Panel(
+            f"[bold]Security assessment:[/bold] {target}",
+            title="DeepLook Security",
+            border_style="red",
+        )
+    )
+
+    security_plugins = {
+        "breach": ["breach-domain", "breach-ip", "malware-hash"],
+        "vuln": ["cve-check", "subdomain-takeover", "ssl-vuln"],
+        "misconfig": ["dns-security", "header-security", "email-security"],
+        "exposure": ["exposed-services", "sensitive-files", "api-exposure"],
+    }
+
+    if security_type:
+        plugin_names = security_plugins.get(security_type, [])
+    else:
+        plugin_names = []
+        for plugins in security_plugins.values():
+            plugin_names.extend(plugins)
+
+    entity = create_entity(target)
+    ws.add_entity(entity)
+    all_plugins = load_all_plugins()
+
+    scorer = SecurityScorer()
+
+    for pname in plugin_names:
+        if pname not in all_plugins:
+            continue
+        plugin = all_plugins[pname]
+        if not plugin.check_key():
+            continue
+
+        console.print(f"  [dim]Running {pname}...[/dim]")
+        result = plugin.execute(entity, ws, cache)
+
+        for e in result.entities:
+            ws.add_entity(e)
+        for edge in result.edges:
+            ws.add_edge(edge)
+
+        findings = result.metadata.get("findings", [])
+        for f_data in findings:
+            finding = Finding(
+                category=f_data.get("category", "Unknown"),
+                check=f_data.get("check", pname),
+                status=FindingStatus(f_data.get("status", "info")),
+                risk=RiskLevel(f_data.get("risk", "info")),
+                message=f_data.get("message", ""),
+                recommendation=f_data.get("recommendation", ""),
+                details=f_data.get("details", {}),
+            )
+            scorer.add_finding(finding)
+
+        ws.add_timeline_event(
+            f"Security plugin {pname} completed",
+            target=target,
+            details={"findings": len(findings)},
+        )
+
+    report = scorer.calculate(target)
+
+    if output_format == "json":
+        import json as json_mod
+
+        report_data = render_security_json(report)
+        console.print(json_mod.dumps(report_data, indent=2))
+    else:
+        render_security_report(report)
+
+    if export:
+        if export == "json":
+            report_data = render_security_json(report)
+            out = Path(export_path or f"security-{target}.json")
+            out.write_text(json.dumps(report_data, indent=2))
+            console.print(f"[green]Exported security report to {out}[/green]")
+        else:
+            _do_export(ws, export, export_path or f"security-{target}.{export}")
 
 
 # --- Helpers ---
