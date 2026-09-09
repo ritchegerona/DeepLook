@@ -54,6 +54,11 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+gui = [
+    "streamlit>=1.36",
+    "pyvis>=0.3",
+    "pandas>=2.0",
+]
 dev = [
     "pytest>=7.4",
     "pytest-asyncio>=0.23",
@@ -75,7 +80,7 @@ include = ["deeplook*"]
 
 [tool.ruff]
 target-version = "py311"
-line-length = 100
+line-length = 120
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP"]

@@ -370,9 +370,7 @@ def scan(
     if export:
         out_dir = Path(export_dir or ".")
         out_dir.mkdir(parents=True, exist_ok=True)
-        _do_export(
-            ws, export, str(out_dir / f"scan-{__import__('datetime').date.today()}.{export}")
-        )
+        _do_export(ws, export, str(out_dir / f"scan-{__import__('datetime').date.today()}.{export}"))
 
 
 @app.command()
@@ -425,9 +423,7 @@ def correlate_cmd(
 
 @app.command("export")
 def export_cmd(
-    format: str = typer.Option(
-        "json", "-f", "--format", help="Export format: csv, xlsx, json, stix"
-    ),
+    format: str = typer.Option("json", "-f", "--format", help="Export format: csv, xlsx, json, stix"),
     report: str = typer.Option("full", "--report", help="Report template"),
     output: str = typer.Option(None, "-o", "--output", help="Output file path"),
     workspace: str = typer.Option(None, "-w", "--workspace"),
@@ -468,9 +464,7 @@ def workspace_cmd(
             raise typer.Exit(1)
         ws = get_workspace(name)
         g = ws.to_graph()
-        console.print(
-            f"[green]Workspace '{name}': {g.entity_count} entities, {g.edge_count} edges[/green]"
-        )
+        console.print(f"[green]Workspace '{name}': {g.entity_count} entities, {g.edge_count} edges[/green]")
 
 
 @app.command("plugins")
@@ -773,6 +767,27 @@ def _do_export(ws: Workspace, fmt: str, path: str, report: str = "full") -> None
         console.print(f"[green]Exported STIX to {result}[/green]")
     else:
         console.print(f"[red]Unknown format: {fmt}[/red]")
+
+
+@app.command()
+def gui() -> None:
+    """Launch the DeepLook GUI dashboard in your browser."""
+    import subprocess
+    import sys
+
+    from deeplook import __version__
+
+    console.print(Panel(
+        f"[bold]DeepLook GUI v{__version__}[/bold]\n\n"
+        "Launching Streamlit dashboard...\n"
+        "The GUI will open in your default browser.\n"
+        "Press Ctrl+C to stop the server.",
+        title="🔍 DeepLook",
+        border_style="blue",
+    ))
+
+    gui_path = Path(__file__).parent / "gui" / "app.py"
+    subprocess.run([sys.executable, "-m", "streamlit", "run", str(gui_path)])
 
 
 if __name__ == "__main__":
