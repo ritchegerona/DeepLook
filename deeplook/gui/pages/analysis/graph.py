@@ -79,24 +79,27 @@ if show_btn or True:
         }
         """)
 
+        entity_ids = {e.id for e in entities}
+
         for entity in entities:
             etype = entity.type.value if hasattr(entity.type, "value") else str(entity.type)
             color = node_colors.get(etype, "#6b7280")
             label = entity.value
             if len(label) > 30:
                 label = label[:27] + "..."
+            has_edge = entity.id in {e.source_id for e in edges} or entity.id in {e.target_id for e in edges}
             net.add_node(
                 entity.id,
                 label=label,
                 title=f"{etype}: {entity.value}",
                 color=color,
-                size=20
-                if entity.id in [e.source_id for e in edges] or entity.id in [e.target_id for e in edges]
-                else 10,
+                size=20 if has_edge else 10,
                 font={"size": 12},
             )
 
         for edge in edges:
+            if edge.source_id not in entity_ids or edge.target_id not in entity_ids:
+                continue
             rel = edge.relationship.value if hasattr(edge.relationship, "value") else str(edge.relationship)
             net.add_edge(
                 edge.source_id,

@@ -141,8 +141,8 @@ def render_timeline_event(event: dict[str, Any]) -> None:
         f"""
         <div style="border-left: 3px solid #3b82f6; padding: 8px 12px; margin-bottom: 8px; margin-left: 4px;">
             <div style="font-size: 12px; color: #888;">{event.get("timestamp", "")}</div>
-            <div style="font-weight: 500;">{event.get("event_type", "")}</div>
-            <div style="color: #aaa; font-size: 13px;">{event.get("description", "")}</div>
+            <div style="font-weight: 500;">{event.get("event", event.get("event_type", ""))}</div>
+            <div style="color: #aaa; font-size: 13px;">{event.get("target", "")} — {event.get("details", event.get("description", ""))}</div>
         </div>
         """,
         unsafe_allow_html=True,

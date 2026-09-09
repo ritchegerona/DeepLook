@@ -103,9 +103,9 @@ def timeline_to_df(events: list[Any]) -> pd.DataFrame:
     for ev in events:
         row = {
             "timestamp": ev.get("timestamp", "") if isinstance(ev, dict) else getattr(ev, "timestamp", ""),
-            "event_type": ev.get("event_type", "") if isinstance(ev, dict) else getattr(ev, "event_type", ""),
+            "event": ev.get("event", ev.get("event_type", "")) if isinstance(ev, dict) else getattr(ev, "event", ""),
             "target": ev.get("target", "") if isinstance(ev, dict) else getattr(ev, "target", ""),
-            "description": ev.get("description", "") if isinstance(ev, dict) else getattr(ev, "description", ""),
+            "details": ev.get("details", ev.get("description", "")) if isinstance(ev, dict) else getattr(ev, "details", ""),
         }
         rows.append(row)
 

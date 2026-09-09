@@ -33,7 +33,7 @@ if run_btn and target:
     ws.add_entity(entity)
 
     all_plugins = load_all_plugins()
-    matching = get_plugins_for_entity(entity)
+    matching = get_plugins_for_entity(entity.type.value)
 
     st.info(f"Detected **{entity.type.value}** — running {len(matching)} plugins")
 

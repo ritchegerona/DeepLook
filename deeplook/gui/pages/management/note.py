@@ -30,7 +30,7 @@ with tab1:
                 else:
                     st.warning(f"Entity '{entity_value}' not found. Note will be added globally.")
 
-            ws.add_note(note_content, entity_id=entity_id)
+            ws.add_note(entity_id, note_content)
             st.success("Note added!")
             st.rerun()
         else:

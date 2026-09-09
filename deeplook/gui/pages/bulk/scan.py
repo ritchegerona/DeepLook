@@ -67,7 +67,7 @@ if uploaded_file and st.button("Start Scan", type="primary", key="scan_run"):
         if plugins_to_run:
             matching = [all_plugins[p] for p in plugins_to_run if p in all_plugins]
         else:
-            matching = get_plugins_for_entity(entity)
+            matching = get_plugins_for_entity(entity.type.value)
 
         results_e = []
         results_ed = []
