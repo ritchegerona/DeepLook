@@ -86,9 +86,7 @@ class EmailSyntax(OSINTPlugin):
                 entity.add_tag("invalid-email")
                 entity.metadata["is_disposable"] = False
 
-            entity.add_provenance(
-                source=self.name, confidence=1.0, raw_data={"email": email, "valid": is_valid}
-            )
+            entity.add_provenance(source=self.name, confidence=1.0, raw_data={"email": email, "valid": is_valid})
             workspace.add_entity(entity)
             result.add_entity(entity)
 

@@ -62,12 +62,8 @@ class Entity:
     tags: list[str] = field(default_factory=list)
     metadata: dict[str, Any] = field(default_factory=dict)
 
-    def add_provenance(
-        self, source: str, confidence: float = 1.0, raw_data: dict[str, Any] | None = None
-    ) -> None:
-        self.provenance.append(
-            ProvenanceEntry(source=source, confidence=confidence, raw_data=raw_data)
-        )
+    def add_provenance(self, source: str, confidence: float = 1.0, raw_data: dict[str, Any] | None = None) -> None:
+        self.provenance.append(ProvenanceEntry(source=source, confidence=confidence, raw_data=raw_data))
         self.last_seen = datetime.now(UTC)
         avg_conf = sum(p.confidence for p in self.provenance) / len(self.provenance)
         self.confidence = round(avg_conf * 100, 1)

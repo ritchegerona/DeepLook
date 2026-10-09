@@ -99,9 +99,7 @@ Provide a structured summary with:
             "3. What correlations to explore"
         )
         result = self._call(prompt)
-        return (
-            result or "AI pivot suggestions unavailable. Set OPENAI_API_KEY or ANTHROPIC_API_KEY."
-        )
+        return result or "AI pivot suggestions unavailable. Set OPENAI_API_KEY or ANTHROPIC_API_KEY."
 
     def generate_report(self, workspace: Workspace) -> str:
         data = self._workspace_summary(workspace)
@@ -119,9 +117,7 @@ Format the report as:
 ## Recommendations
 ## Appendix: Raw Data Summary"""
         result = self._call(prompt, max_tokens=4000)
-        return (
-            result or "AI report generation unavailable. Set OPENAI_API_KEY or ANTHROPIC_API_KEY."
-        )
+        return result or "AI report generation unavailable. Set OPENAI_API_KEY or ANTHROPIC_API_KEY."
 
     def natural_query(self, workspace: Workspace, question: str) -> str:
         data = self._workspace_summary(workspace)
@@ -160,8 +156,7 @@ Provide a clear, factual answer based on the data above."""
             "edge_count": len(edges),
             "entities_by_type": entity_summary,
             "relationships": [
-                {"from": e.source_id, "to": e.target_id, "type": e.relationship.value}
-                for e in edges[:50]
+                {"from": e.source_id, "to": e.target_id, "type": e.relationship.value} for e in edges[:50]
             ],
             "notes": [n["content"] for n in notes],
             "timeline": [t["event"] for t in timeline[-20:]],

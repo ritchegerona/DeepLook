@@ -94,9 +94,7 @@ class EmailBreach(OSINTPlugin):
                 entity.metadata["breached"] = False
                 entity.metadata["breach_count"] = 0
                 entity.add_tag("not-breached")
-                entity.add_provenance(
-                    source=self.name, confidence=0.9, raw_data={"breached": False}
-                )
+                entity.add_provenance(source=self.name, confidence=0.9, raw_data={"breached": False})
 
             elif resp.status_code == 401:
                 result.add_warning("HIBP API key is invalid or unauthorized")

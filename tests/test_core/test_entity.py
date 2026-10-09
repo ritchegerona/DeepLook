@@ -29,10 +29,7 @@ class TestEntityType:
         assert detect_entity_type("da39a3ee5e6b4b0d3255bfef95601890afd80709") == EntityType.HASH
 
     def test_detect_sha256(self):
-        assert (
-            detect_entity_type("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
-            == EntityType.HASH
-        )
+        assert detect_entity_type("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855") == EntityType.HASH
 
     def test_detect_phone(self):
         assert detect_entity_type("+15551234567") == EntityType.PHONE

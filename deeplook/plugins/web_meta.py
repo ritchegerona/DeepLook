@@ -56,9 +56,7 @@ class WebMetaPlugin(OSINTPlugin):
                     twitter[attr] = tag.get("content", "")
 
             favicon = ""
-            link_tag = soup.find("link", attrs={"rel": "icon"}) or soup.find(
-                "link", attrs={"rel": "shortcut icon"}
-            )
+            link_tag = soup.find("link", attrs={"rel": "icon"}) or soup.find("link", attrs={"rel": "shortcut icon"})
             if link_tag:
                 favicon = link_tag.get("href", "")
 

@@ -69,11 +69,7 @@ class IntelGraph:
 
     def _find_edge(self, source_id: str, target_id: str, relationship: str) -> Edge | None:
         for edge in self._edges.values():
-            if (
-                edge.source_id == source_id
-                and edge.target_id == target_id
-                and edge.relationship.value == relationship
-            ):
+            if edge.source_id == source_id and edge.target_id == target_id and edge.relationship.value == relationship:
                 return edge
         return None
 
@@ -197,9 +193,7 @@ class IntelGraph:
             is_last_child = i == len(neighbors) - 1
             text.append(f"{child_prefix}", style="dim")
             text.append(f"──{edge.label}→ ", style="dim")
-            self._render_node(
-                text, neighbor.id, depth + 1, max_depth, visited, child_prefix, is_last_child
-            )
+            self._render_node(text, neighbor.id, depth + 1, max_depth, visited, child_prefix, is_last_child)
 
     def render_map(self, locations: dict[str, tuple[float, float]] | None = None) -> Text:
         """Render a simple ASCII world map with IP locations."""

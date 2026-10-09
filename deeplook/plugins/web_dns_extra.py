@@ -107,9 +107,9 @@ class WebDnsExtraPlugin(OSINTPlugin):
                     ):
                         dnssec_info["has_rrsig"] = False
 
-                    dnssec_info["dnssec_enabled"] = dnssec_info.get(
-                        "has_dnskey", False
-                    ) and dnssec_info.get("has_rrsig", False)
+                    dnssec_info["dnssec_enabled"] = dnssec_info.get("has_dnskey", False) and dnssec_info.get(
+                        "has_rrsig", False
+                    )
 
                 except Exception as e:
                     dnssec_info["error"] = str(e)

@@ -111,13 +111,9 @@ class ExposedServicesPlugin(OSINTPlugin):
                             "check": "Admin Panel Exposed",
                             "status": "fail",
                             "risk": "high",
-                            "message": (
-                                f"Admin panel accessible at {entry['path']} "
-                                f"(HTTP {entry['status']})"
-                            ),
+                            "message": (f"Admin panel accessible at {entry['path']} (HTTP {entry['status']})"),
                             "recommendation": (
-                                "Restrict access to admin panels via IP whitelist, "
-                                "VPN, or authentication."
+                                "Restrict access to admin panels via IP whitelist, VPN, or authentication."
                             ),
                         }
                     )
@@ -131,13 +127,8 @@ class ExposedServicesPlugin(OSINTPlugin):
                             "check": "Debug Endpoint Exposed",
                             "status": "fail",
                             "risk": "high",
-                            "message": (
-                                f"Debug endpoint accessible at {entry['path']} "
-                                f"(HTTP {entry['status']})"
-                            ),
-                            "recommendation": (
-                                "Disable debug endpoints in production or restrict access."
-                            ),
+                            "message": (f"Debug endpoint accessible at {entry['path']} (HTTP {entry['status']})"),
+                            "recommendation": ("Disable debug endpoints in production or restrict access."),
                         }
                     )
                     entity.add_tag("debug-exposed")
@@ -150,9 +141,7 @@ class ExposedServicesPlugin(OSINTPlugin):
                             "check": "Sensitive Service Exposed",
                             "status": "fail",
                             "risk": "high",
-                            "message": (
-                                f"Sensitive service at {entry['path']} (HTTP {entry['status']})"
-                            ),
+                            "message": (f"Sensitive service at {entry['path']} (HTTP {entry['status']})"),
                             "recommendation": "Restrict or remove exposed sensitive services.",
                         }
                     )

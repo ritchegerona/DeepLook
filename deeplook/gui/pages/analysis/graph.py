@@ -29,8 +29,8 @@ if show_btn or True:
         st.stop()
 
     try:
-        from pyvis.network import Network
         import streamlit.components.v1 as components
+        from pyvis.network import Network
 
         node_colors = {
             "domain": "#3b82f6",

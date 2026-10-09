@@ -7,7 +7,6 @@ import streamlit as st
 from deeplook.core.entity import create_entity
 from deeplook.core.plugin_loader import get_plugins_for_entity, load_all_plugins
 from deeplook.gui.components.data import edges_to_df, entities_to_df
-from deeplook.gui.components.state import get_workspace
 
 st.title("🔬 Auto-Analyze Target")
 

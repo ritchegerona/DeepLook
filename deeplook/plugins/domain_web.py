@@ -90,9 +90,7 @@ class DomainWeb(OSINTPlugin):
                 parsed = urlparse(final_url)
                 redirect_domain = parsed.netloc
                 if redirect_domain and redirect_domain != entity.value:
-                    redir_entity = Entity(
-                        type=EntityType.DOMAIN, value=redirect_domain, confidence=85.0
-                    )
+                    redir_entity = Entity(type=EntityType.DOMAIN, value=redirect_domain, confidence=85.0)
                     redir_entity.add_provenance(source=self.name, confidence=0.85)
                     workspace.add_entity(redir_entity)
                     result.add_entity(redir_entity)

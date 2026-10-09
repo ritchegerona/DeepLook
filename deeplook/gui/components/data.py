@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from dataclasses import asdict
 from typing import Any
 
 import pandas as pd
@@ -105,7 +104,9 @@ def timeline_to_df(events: list[Any]) -> pd.DataFrame:
             "timestamp": ev.get("timestamp", "") if isinstance(ev, dict) else getattr(ev, "timestamp", ""),
             "event": ev.get("event", ev.get("event_type", "")) if isinstance(ev, dict) else getattr(ev, "event", ""),
             "target": ev.get("target", "") if isinstance(ev, dict) else getattr(ev, "target", ""),
-            "details": ev.get("details", ev.get("description", "")) if isinstance(ev, dict) else getattr(ev, "details", ""),
+            "details": (
+                ev.get("details", ev.get("description", "")) if isinstance(ev, dict) else getattr(ev, "details", "")
+            ),
         }
         rows.append(row)
 

@@ -59,9 +59,7 @@ class UsernameSocial(OSINTPlugin):
                         found_platforms.append(platform)
                         domain_val = url.split("//")[1].split("/")[0].lower()
 
-                        domain_entity = Entity(
-                            type=EntityType.DOMAIN, value=domain_val, confidence=90.0
-                        )
+                        domain_entity = Entity(type=EntityType.DOMAIN, value=domain_val, confidence=90.0)
                         domain_entity.add_provenance(
                             source=self.name,
                             confidence=0.9,
@@ -87,9 +85,7 @@ class UsernameSocial(OSINTPlugin):
             entity.metadata["found_platforms"] = found_platforms
             entity.metadata["platforms_checked"] = len(PLATFORM_URLS)
             entity.metadata["platforms_found"] = len(found_platforms)
-            entity.add_provenance(
-                source=self.name, confidence=0.85, raw_data={"found": found_platforms}
-            )
+            entity.add_provenance(source=self.name, confidence=0.85, raw_data={"found": found_platforms})
             workspace.add_entity(entity)
             result.add_entity(entity)
 

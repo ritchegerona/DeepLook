@@ -116,9 +116,7 @@ class CveCheckPlugin(OSINTPlugin):
                     }
                 )
 
-            entity.metadata["detected_software"] = [
-                {"name": n, "version": v, "header": h} for n, v, h in detected
-            ]
+            entity.metadata["detected_software"] = [{"name": n, "version": v, "header": h} for n, v, h in detected]
 
             result.metadata["findings"] = findings
 

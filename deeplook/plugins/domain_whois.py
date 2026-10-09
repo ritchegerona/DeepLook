@@ -22,24 +22,14 @@ class DomainWhois(OSINTPlugin):
 
             entity.metadata["registrar"] = w.registrar
             entity.metadata["creation_date"] = str(w.creation_date) if w.creation_date else None
-            entity.metadata["expiration_date"] = (
-                str(w.expiration_date) if w.expiration_date else None
-            )
-            entity.metadata["status"] = (
-                w.status if isinstance(w.status, list) else [w.status] if w.status else []
-            )
+            entity.metadata["expiration_date"] = str(w.expiration_date) if w.expiration_date else None
+            entity.metadata["status"] = w.status if isinstance(w.status, list) else [w.status] if w.status else []
             entity.metadata["name_servers"] = (
-                w.name_servers
-                if isinstance(w.name_servers, list)
-                else [w.name_servers]
-                if w.name_servers
-                else []
+                w.name_servers if isinstance(w.name_servers, list) else [w.name_servers] if w.name_servers else []
             )
             entity.metadata["registrant"] = w.org or w.name
             entity.metadata["country"] = w.country
-            entity.metadata["emails"] = (
-                w.emails if isinstance(w.emails, list) else [w.emails] if w.emails else []
-            )
+            entity.metadata["emails"] = w.emails if isinstance(w.emails, list) else [w.emails] if w.emails else []
 
             entity.add_provenance(source=self.name, confidence=0.9, raw_data={"whois_raw": str(w)})
             entity.add_tag("whois-looked-up")
@@ -70,9 +60,7 @@ class DomainWhois(OSINTPlugin):
                 for email in emails:
                     if not email or "@" not in email:
                         continue
-                    email_entity = Entity(
-                        type=EntityType.EMAIL, value=email.strip().lower(), confidence=80.0
-                    )
+                    email_entity = Entity(type=EntityType.EMAIL, value=email.strip().lower(), confidence=80.0)
                     email_entity.add_provenance(source=self.name, confidence=0.8)
                     workspace.add_entity(email_entity)
                     result.add_entity(email_entity)

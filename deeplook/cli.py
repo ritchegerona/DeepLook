@@ -777,14 +777,16 @@ def gui() -> None:
 
     from deeplook import __version__
 
-    console.print(Panel(
-        f"[bold]DeepLook GUI v{__version__}[/bold]\n\n"
-        "Launching Streamlit dashboard...\n"
-        "The GUI will open in your default browser.\n"
-        "Press Ctrl+C to stop the server.",
-        title="🔍 DeepLook",
-        border_style="blue",
-    ))
+    console.print(
+        Panel(
+            f"[bold]DeepLook GUI v{__version__}[/bold]\n\n"
+            "Launching Streamlit dashboard...\n"
+            "The GUI will open in your default browser.\n"
+            "Press Ctrl+C to stop the server.",
+            title="🔍 DeepLook",
+            border_style="blue",
+        )
+    )
 
     gui_path = Path(__file__).parent / "gui" / "app.py"
     subprocess.run([sys.executable, "-m", "streamlit", "run", str(gui_path)])

@@ -75,9 +75,7 @@ def _discover_plugins(directory: Path) -> None:
             pass
 
 
-def get_plugins_for_entity(
-    entity_type: str, plugins: dict[str, OSINTPlugin] | None = None
-) -> list[OSINTPlugin]:
+def get_plugins_for_entity(entity_type: str, plugins: dict[str, OSINTPlugin] | None = None) -> list[OSINTPlugin]:
     """Get all plugins that handle a specific entity type."""
     if plugins is None:
         plugins = load_all_plugins()

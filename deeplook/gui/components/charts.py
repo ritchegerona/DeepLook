@@ -84,10 +84,13 @@ def render_finding_card(finding: dict[str, Any]) -> None:
 
     st.markdown(
         f"""
-        <div style="border: 1px solid #333; border-radius: 8px; padding: 12px; margin-bottom: 8px; border-left: 4px solid {risk_color};">
+        <div style="border: 1px solid #333; border-radius: 8px; padding: 12px;
+                    margin-bottom: 8px; border-left: 4px solid {risk_color};">
             <div style="display: flex; gap: 8px; margin-bottom: 4px;">
-                <span style="background: {status_color}22; color: {status_color}; padding: 2px 8px; border-radius: 4px; font-size: 12px;">{status.upper()}</span>
-                <span style="background: {risk_color}22; color: {risk_color}; padding: 2px 8px; border-radius: 4px; font-size: 12px;">{risk.upper()}</span>
+                <span style="background: {status_color}22; color: {status_color};
+                             padding: 2px 8px; border-radius: 4px; font-size: 12px;">{status.upper()}</span>
+                <span style="background: {risk_color}22; color: {risk_color};
+                             padding: 2px 8px; border-radius: 4px; font-size: 12px;">{risk.upper()}</span>
                 <span style="color: #888; font-size: 12px;">{finding.get("category", "")}</span>
             </div>
             <div style="font-weight: 500; margin-bottom: 4px;">{finding.get("message", "")}</div>
@@ -124,8 +127,10 @@ def render_entity_card(entity_type: str, value: str, confidence: float = 0.0, ta
 
     st.markdown(
         f"""
-        <div style="border: 1px solid #333; border-radius: 6px; padding: 8px 12px; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
-            <span style="background: {color}; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 500;">{entity_type.upper()}</span>
+        <div style="border: 1px solid #333; border-radius: 6px; padding: 8px 12px;
+                    margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+            <span style="background: {color}; color: white; padding: 2px 8px; border-radius: 4px;
+                         font-size: 12px; font-weight: 500;">{entity_type.upper()}</span>
             <span style="font-family: monospace; font-size: 14px;">{value}</span>
             <span style="color: #888; font-size: 12px; margin-left: auto;">{confidence:.0f}%</span>
             {tags_html}
@@ -142,7 +147,8 @@ def render_timeline_event(event: dict[str, Any]) -> None:
         <div style="border-left: 3px solid #3b82f6; padding: 8px 12px; margin-bottom: 8px; margin-left: 4px;">
             <div style="font-size: 12px; color: #888;">{event.get("timestamp", "")}</div>
             <div style="font-weight: 500;">{event.get("event", event.get("event_type", ""))}</div>
-            <div style="color: #aaa; font-size: 13px;">{event.get("target", "")} — {event.get("details", event.get("description", ""))}</div>
+            <div style="color: #aaa; font-size: 13px;">{event.get("target", "")} —
+                {event.get("details", event.get("description", ""))}</div>
         </div>
         """,
         unsafe_allow_html=True,

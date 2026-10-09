@@ -62,9 +62,7 @@ class OSINTPlugin(ABC):
 
         return bool(os.environ.get(self.key_env_var))
 
-    def execute(
-        self, entity: Entity, workspace: Workspace, cache: ResultCache | None = None
-    ) -> PluginResult:
+    def execute(self, entity: Entity, workspace: Workspace, cache: ResultCache | None = None) -> PluginResult:
         """Wrapper around run() with timing, caching, and error handling."""
         if cache and not self.requires_key:
             cached = cache.get(self.name, entity.value)
