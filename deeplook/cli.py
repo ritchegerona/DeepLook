@@ -9,11 +9,13 @@ import typer
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
+from rich.text import Text
 
 from deeplook import __version__
 from deeplook.core.cache import ResultCache
-from deeplook.core.entity import EntityType, create_entity
+from deeplook.core.entity import ENTITY_COLORS, EntityType, create_entity
 from deeplook.core.graph import IntelGraph
+from deeplook.core.pivot import PivotEngine, PivotResult
 from deeplook.core.plugin_loader import get_plugins_for_entity, load_all_plugins
 from deeplook.core.workspace import Workspace
 from deeplook.output.correlation import correlate
@@ -725,7 +727,83 @@ def security(
             _do_export(ws, export, export_path or f"security-{target}.{export}")
 
 
+@app.command()
+def pivot(
+    target: str = typer.Argument(help="Seed indicator to pivot from (auto-detect type)"),
+    workspace: str = typer.Option(None, "-w", "--workspace", help="Workspace name"),
+    depth: int = typer.Option(2, "--depth", "-d", help="Maximum pivot depth"),
+    max_entities: int = typer.Option(50, "--max-entities", help="Maximum unique entities to discover"),
+    plugins: str = typer.Option(None, "--plugins", help="Comma-separated plugin names to restrict to"),
+    export: str = typer.Option(None, "--export", help="Export format: csv, xlsx, json, stix"),
+    export_path: str = typer.Option(None, "--output", help="Export file path"),
+    no_cache: bool = typer.Option(False, "--no-cache", help="Skip cache"),
+) -> None:
+    """Recursively expand a seed indicator (e.g. IP -> ASN/org -> domains)."""
+    ws = get_workspace(workspace)
+    cache = None if no_cache else ResultCache()
+    plugin_filter = [p.strip() for p in plugins.split(",") if p.strip()] if plugins else None
+
+    console.print(
+        Panel(
+            f"[bold]Pivoting:[/bold] {target}  (depth={depth}, max-entities={max_entities})",
+            title="DeepLook",
+            border_style="magenta",
+        )
+    )
+
+    try:
+        engine = PivotEngine(
+            ws,
+            max_depth=depth,
+            max_entities=max_entities,
+            cache=cache,
+            plugin_filter=plugin_filter,
+        )
+        result = engine.pivot(target)
+    except ValueError as exc:
+        console.print(f"[red]Cannot pivot '{target}': {exc}[/red]")
+        raise typer.Exit(code=1) from exc
+
+    _print_pivot_summary(result)
+
+    if export:
+        _do_export(ws, export, export_path or f"deeplook-pivot-{target}.{export}")
+
+
 # --- Helpers ---
+
+
+def _print_pivot_summary(result: PivotResult) -> None:
+    table = Table(title=f"Pivot from {result.root}", show_lines=True, expand=True)
+    table.add_column("Depth", justify="right", style="bold")
+    table.add_column("Type")
+    table.add_column("Value")
+    table.add_column("Discovered By")
+
+    for node in sorted(result.nodes, key=lambda n: (n.depth, n.type, n.value)):
+        try:
+            entity_type: EntityType | None = EntityType(node.type)
+        except ValueError:
+            entity_type = None
+        color = ENTITY_COLORS.get(entity_type, "white")
+        table.add_row(
+            str(node.depth),
+            Text(node.type, style=color),
+            node.value,
+            node.plugin or "-",
+        )
+    console.print(table)
+
+    console.print(
+        f"[bold]Entities added:[/bold] {result.entities_added}  "
+        f"[bold]Edges added:[/bold] {result.edges_added}  "
+        f"[bold]Plugins run:[/bold] {result.plugins_run}"
+    )
+    if result.truncated:
+        console.print("[yellow]Entity budget reached; pivot truncated. Increase --max-entities for more.[/yellow]")
+    if result.errors:
+        for warning in result.errors:
+            console.print(f"[yellow]warning:[/yellow] {warning}")
 
 
 def _print_graph_summary(graph: IntelGraph, target: str) -> None:
