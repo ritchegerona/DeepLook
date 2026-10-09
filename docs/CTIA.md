@@ -11,11 +11,11 @@ DeepLook automates the **Collection** and **Processing** stages of the Intellige
 | Lifecycle Stage | DeepLook Feature | Commands |
 |-----------------|------------------|----------|
 | **Planning & Direction** | Workspace management, investigation notes | `workspace new`, `note` |
-| **Collection** | 38+ passive OSINT plugins | `domain`, `ip`, `email`, `username`, `website`, `scan` |
-| **Processing** | Entity normalization, graph construction, caching | `analyze`, `graph` |
-| **Analysis** | Correlation engine, AI pivot suggestions, security assessment | `correlate`, `ai pivot`, `query`, `security` |
-| **Dissemination** | Export to CSV/Excel/JSON/STIX, report templates | `export`, `ai report` |
-| **Feedback** | Timeline tracking, diff comparison | `timeline`, `diff` |
+| **Collection** | 38+ passive OSINT plugins, IOC feed ingestion | `domain`, `ip`, `email`, `username`, `website`, `scan`, `ingest` |
+| **Processing** | Entity normalization, defang/refang, graph construction, caching | `analyze`, `ingest`, `graph` |
+| **Analysis** | Correlation engine, recursive auto-pivot, ATT&CK mapping, security assessment, watchlist monitoring | `correlate`, `pivot`, `attack`, `watch`, `query`, `security` |
+| **Dissemination** | Export to CSV/Excel/JSON/STIX, report templates incl. ATT&CK | `export`, `attack`, `ai report` |
+| **Feedback** | Timeline tracking, diff comparison, watchlist change detection | `timeline`, `diff`, `watch check` |
 
 ---
 
@@ -190,8 +190,69 @@ deeplook diff week1/scan.json week2/scan.json
 
 ---
 
-## IOC Types and STIX Mapping
+### Exercise 7: Recursive Pivoting & ATT&CK Mapping
 
+```bash
+# Expand from a seed indicator, discovering related infrastructure
+deeplook pivot example.com --depth 2 --max-entities 50
+
+# Map the resulting findings to MITRE ATT&CK techniques
+deeplook attack
+
+# Persist technique IDs and export an ATT&CK coverage report
+deeplook attack --annotate
+deeplook export --format xlsx --report attack --output attack-coverage.xlsx
+```
+
+**Skills practiced:** Infrastructure pivoting, MITRE ATT&CK technique mapping, adversary-tactic coverage
+
+---
+
+### Exercise 8: IOC Feed Ingestion & Watchlist Monitoring
+
+```bash
+# Ingest a defanged IOC feed and tag it
+deeplook ingest -f threat-feed.txt --tags apt29
+
+# Add key indicators to a watchlist
+deeplook watch add evil[.]com -w case-001 --tags c2
+
+# Re-check later and diff for newly observed infrastructure
+deeplook watch check -w case-001
+
+# Ingest a STIX bundle from another TIP
+deeplook ingest -f external-bundle.json --format stix
+```
+
+**Skills practiced:** Feed ingestion, defang/refang handling, STIX/MISP interop, continuous monitoring
+
+---
+
+## MITRE ATT&CK Mapping
+
+DeepLook maps its collection and analysis activity to ATT&CK techniques via
+plugin provenance (the plugin that produced a finding), with an entity-type
+fallback when provenance is unavailable. Because DeepLook is a passive
+collection and reconnaissance tool, its techniques sit primarily in the
+**Reconnaissance** and **Resource Development** tactics.
+
+| DeepLook Activity | Example Plugins | ATT&CK Techniques |
+|-------------------|-----------------|-------------------|
+| DNS enumeration | `domain-dns`, `dns-security`, `web-dns-extra` | T1590.002 (DNS), T1596.001 (DNS/Passive DNS) |
+| WHOIS / registration | `domain-whois`, `ip-whois` | T1596.002 (WHOIS) |
+| Subdomain discovery | `domain-subdomain`, `crtsh` | T1590.001 (Domain Properties) |
+| Active scanning / ports | `ip-ports`, `exposed-services` | T1595 (Active Scanning), T1595.001 (Scanning IP Blocks) |
+| Vulnerability checks | `cve-check`, `ssl-vuln`, `subdomain-takeover` | T1595.002 (Vulnerability Scanning) |
+| Email/mail infrastructure | `email-mx`, `email-security`, `web-emails` | T1589.002 (Email Addresses) |
+| Username / persona | `username-social` | T1589.003 (Employee Names) |
+| Host/software fingerprint | `web-tech`, `web-headers`, `web-cert` | T1592.002 (Software) |
+
+Use `deeplook attack` to generate coverage from a workspace, `--annotate` to
+persist IDs to entities, and `--report attack` on export for a spreadsheet.
+
+---
+
+## IOC Types and STIX Mapping
 DeepLook entities map to STIX 2.1 objects:
 
 | DeepLook Entity | STIX Object | Pattern Type |

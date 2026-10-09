@@ -24,6 +24,10 @@ DeepLook maps to the **CTIA Intelligence Lifecycle**: it automates the *collecti
 - **Deep website profiling**: Tech stack, headers, certificates, emails, subdomains
 - **Cross-target correlation**: Auto-detect shared infrastructure, contacts, technology
 - **Security assessment**: Vulnerability scanning, breach detection, misconfiguration checks
+- **Auto-pivot**: Recursively expand an indicator breadth-first to discover related infrastructure
+- **MITRE ATT&CK mapping**: Map plugins and entities to ATT&CK techniques and export coverage
+- **IOC ingestion**: Import text/CSV/STIX 2.1/MISP feeds with automatic defang/refang
+- **Watchlist monitoring**: Track indicators and diff newly discovered (or vanished) entities over time
 
 ### Export & Reporting
 - **CSV**: Universal, spreadsheet-compatible
@@ -125,6 +129,27 @@ deeplook correlate
 deeplook search "example.com"
 ```
 
+### Pivoting, ATT&CK & Feeds
+
+```bash
+# Recursively pivot from a seed indicator (breadth-first)
+deeplook pivot example.com --depth 2 --max-entities 50
+
+# Map workspace findings to MITRE ATT&CK techniques
+deeplook attack
+deeplook attack --annotate        # persist technique IDs to entities
+deeplook attack -f json           # machine-readable output
+
+# Ingest an IOC feed (auto-detects text, CSV, STIX 2.1, MISP)
+deeplook ingest -f indicators.txt --tags apt29
+deeplook ingest -f bundle.json --format stix
+
+# Watchlist: track indicators and detect changes
+deeplook watch add evil[.]com -w case-001 --tags c2
+deeplook watch list -w case-001
+deeplook watch check -w case-001
+```
+
 ### Export & Reporting
 
 ```bash
@@ -176,7 +201,15 @@ deeplook timeline
 | `deeplook security <target>` | Security vulnerability assessment | `deeplook security example.com` |
 | `deeplook scan -f <file>` | Bulk scan from file | `deeplook scan -f targets.txt` |
 | `deeplook graph` | ASCII entity graph | `deeplook graph --center example.com` |
+| `deeplook pivot <target>` | Recursive entity expansion | `deeplook pivot example.com --depth 2` |
+| `deeplook attack` | MITRE ATT&CK coverage mapping | `deeplook attack --annotate` |
+| `deeplook ingest -f <file>` | Ingest IOC feeds (text/CSV/STIX/MISP) | `deeplook ingest -f feed.txt` |
+| `deeplook watch <action>` | Watchlist add/list/remove/check | `deeplook watch check -w case-001` |
 | `deeplook correlate` | Cross-target correlation | `deeplook correlate` |
+| `deeplook pivot <target>` | Recursive entity expansion | `deeplook pivot example.com --depth 2` |
+| `deeplook attack` | MITRE ATT&CK coverage mapping | `deeplook attack --annotate` |
+| `deeplook ingest -f <file>` | Ingest IOC feeds (text/CSV/STIX/MISP) | `deeplook ingest -f feed.txt` |
+| `deeplook watch <action>` | Watchlist add/list/remove/check | `deeplook watch check -w case-001` |
 | `deeplook export` | Export workspace data | `deeplook export --format xlsx` |
 | `deeplook workspace` | Case management | `deeplook workspace new --name case-001` |
 | `deeplook plugins` | Plugin management | `deeplook plugins --action list` |
@@ -250,7 +283,7 @@ deeplook export --format csv --output results.csv
 ```bash
 deeplook export --format xlsx --report technical --output report.xlsx
 ```
-Produces a 12-sheet workbook: Summary, Entities, Relationships, Domain Details, IP Details, Website Profiles, Username Results, Email Analysis, IOCs, Correlation, Timeline, Notes.
+Produces a 12-sheet workbook: Summary, Entities, Relationships, Domain Details, IP Details, Username Results, Email Analysis, IOCs, Correlation, ATT&CK, Timeline, Notes.
 
 ### JSON
 ```bash
@@ -273,6 +306,7 @@ OASIS STIX 2.1 bundle compatible with MISP, OpenCTI, and other TIPs.
 | `executive` | High-level summary | Summary, IOCs |
 | `technical` | Full technical detail | All sheets |
 | `ioc` | Flat IOC list | IOCs only |
+| `attack` | ATT&CK coverage only | Summary, ATT&CK |
 | `phishing` | Phishing investigation | Domain, Email, Website, IOCs |
 | `threat-actor` | Attribution focus | Username, Email, Correlation, Timeline |
 | `infrastructure` | Network/infra focus | IP, Domain, Certificates |
@@ -320,9 +354,9 @@ DeepLook stores configuration in `~/.deeplook/`:
 
 DeepLook maps to the EC-Council CTIA / Threat Intelligence Lifecycle:
 
-- **Collection**: All 26+ plugins are passive, open-source collection modules
-- **Processing**: `--json` and `--export` normalize indicators into structured records
-- **Analysis**: Graph visualization, correlation engine, AI-powered pivot suggestions
+- **Collection**: All 38 plugins are passive, open-source collection modules, plus IOC feed ingestion (text/CSV/STIX/MISP)
+- **Processing**: `--json` and `--export` normalize indicators into structured records, with automatic defang/refang
+- **Analysis**: Graph visualization, correlation engine, recursive auto-pivot, MITRE ATT&CK coverage, watchlist monitoring
 - **Dissemination**: Report templates (Executive, Technical, IOC) ready for deliverables
 
 See [docs/CTIA.md](docs/CTIA.md) for detailed module mapping.

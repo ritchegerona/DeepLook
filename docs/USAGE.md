@@ -352,6 +352,123 @@ deeplook query "show me all breached accounts"
 
 ---
 
+## Pivoting & ATT&CK
+
+### `deeplook pivot <target>`
+
+Recursively expand an indicator breadth-first, running the relevant plugins on
+each newly discovered entity and persisting the resulting graph.
+
+```bash
+deeplook pivot <target> [OPTIONS]
+```
+
+**Options:**
+| Option | Short | Description | Default |
+|--------|-------|-------------|---------|
+| `--depth` | `-d` | Maximum expansion depth | `2` |
+| `--max-entities` | | Entity budget before truncating | `50` |
+| `--plugins` | | Comma-separated plugin names to restrict expansion | all |
+| `--workspace` | `-w` | Workspace name | |
+
+**Examples:**
+```bash
+deeplook pivot example.com
+deeplook pivot example.com --depth 3 --max-entities 100
+deeplook pivot 8.8.8.8 --plugins ip-revdns
+```
+
+---
+
+### `deeplook attack`
+
+Map workspace findings to MITRE ATT&CK techniques (Reconnaissance and Resource
+Development tactics) via plugin provenance, with an entity-type fallback.
+
+```bash
+deeplook attack [OPTIONS]
+```
+
+**Options:**
+| Option | Short | Description | Default |
+|--------|-------|-------------|---------|
+| `--annotate` | | Persist technique IDs into entity metadata | off |
+| `--format` | `-f` | Output format: `table`, `json` | `table` |
+| `--workspace` | `-w` | Workspace name | |
+
+**Examples:**
+```bash
+deeplook attack
+deeplook attack --annotate
+deeplook attack -f json
+```
+
+---
+
+## Threat Intelligence Feeds
+
+### `deeplook ingest`
+
+Ingest IOC feeds into a workspace. Supports plain/defanged text (one indicator
+per line), CSV, STIX 2.1 bundles, and MISP event JSON. Indicators are refanged,
+de-duplicated, tagged, and stored with `ingest:<file>` provenance.
+
+```bash
+deeplook ingest -f <file> [OPTIONS]
+```
+
+**Options:**
+| Option | Short | Description | Default |
+|--------|-------|-------------|---------|
+| `--file` | `-f` | Feed file to ingest | *required* |
+| `--format` | | Format: `auto`, `text`, `csv`, `stix`, `misp` | `auto` |
+| `--tags` | | Comma-separated tags to apply | |
+| `--output-format` | | Output format: `table`, `json` | `table` |
+| `--workspace` | `-w` | Workspace name | |
+
+**Examples:**
+```bash
+deeplook ingest -f indicators.txt --tags apt29
+deeplook ingest -f feed.csv --format csv
+deeplook ingest -f bundle.json --format stix --output-format json
+```
+
+---
+
+### `deeplook watch`
+
+Manage the watchlist and check watched indicators for newly discovered (or
+vanished) related entities.
+
+```bash
+deeplook watch <action> [value] [OPTIONS]
+```
+
+**Actions:**
+- `add` — Add an indicator to the watchlist
+- `list` — List watched indicators
+- `remove` — Remove a watch by id
+- `check` — Re-run plugins and diff against the previous check (all, or one id)
+
+**Options:**
+| Option | Short | Description |
+|--------|-------|-------------|
+| `--tags` | | Comma-separated tags (add) |
+| `--note` | | Note (add) |
+| `--output-format` | | Output format: `table`, `json` |
+| `--workspace` | `-w` | Workspace name |
+
+**Examples:**
+```bash
+deeplook watch add evil[.]com -w case-001 --tags c2
+deeplook watch list -w case-001
+deeplook watch check -w case-001
+deeplook watch check 2 -w case-001
+deeplook watch remove 2 -w case-001
+```
+
+---
+
 ## Export & Reporting
 
 ### `deeplook export`
@@ -370,7 +487,7 @@ deeplook export [OPTIONS]
 | `--output` | `-o` | Output file path | |
 | `--workspace` | `-w` | Workspace name | |
 
-**Report templates:** `executive`, `technical`, `ioc`, `phishing`, `threat_actor`, `infrastructure`, `custom`
+**Report templates:** `executive`, `technical`, `ioc`, `phishing`, `threat_actor`, `infrastructure`, `attack`, `custom`
 
 **Examples:**
 ```bash
