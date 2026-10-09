@@ -40,9 +40,7 @@ def render_entity_table(entities: list[Entity], title: str = "Entities") -> Tabl
     return table
 
 
-def render_edge_table(
-    edges: list[Edge], entities: dict[str, Entity], title: str = "Relationships"
-) -> Table:
+def render_edge_table(edges: list[Edge], entities: dict[str, Entity], title: str = "Relationships") -> Table:
     table = Table(title=title, show_lines=True, expand=True)
     table.add_column("Source", style="bold")
     table.add_column("Relationship", style="dim")

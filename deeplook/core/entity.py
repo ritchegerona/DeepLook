@@ -149,9 +149,46 @@ _URL_RE = re.compile(r"^https?://")
 _DOMAIN_RE = re.compile(r"^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$")
 
 
+# --- Defang / Refang ---
+
+_DEFANG_SCHEMES = (("https", "hxxps"), ("http", "hxxp"), ("ftp", "fxp"))
+
+_REFANG_PAIRS = (
+    ("[://]", "://"),
+    ("[//]", "//"),
+    ("[:]", ":"),
+    ("[.]", "."),
+    ("(.)", "."),
+    ("{.}", "."),
+    ("[dot]", "."),
+    ("[@]", "@"),
+    ("[at]", "@"),
+    ("hxxps", "https"),
+    ("hxxp", "http"),
+    ("fxp", "ftp"),
+)
+
+
+def defang(value: str) -> str:
+    """Neutralize an indicator for safe sharing (``http`` -> ``hxxp``, ``.`` -> ``[.]``)."""
+    result = value.strip().replace("://", "[://]").replace(".", "[.]").replace("@", "[@]")
+    for scheme, replacement in _DEFANG_SCHEMES:
+        result = result.replace(scheme, replacement)
+    return result
+
+
+def refang(value: str) -> str:
+    """Restore a defanged indicator to its original form."""
+    result = value.strip()
+    for token, replacement in _REFANG_PAIRS:
+        for variant in {token, token.upper(), token.capitalize()}:
+            result = result.replace(variant, replacement)
+    return result
+
+
 def detect_entity_type(value: str) -> EntityType | None:
     """Auto-detect entity type from a string value."""
-    value = value.strip()
+    value = refang(value)
 
     if _IP_RE.match(value):
         return EntityType.IP
@@ -171,10 +208,11 @@ def detect_entity_type(value: str) -> EntityType | None:
 
 
 def create_entity(value: str, entity_type: EntityType | None = None, **kwargs: Any) -> Entity:
-    """Create an entity, auto-detecting type if not specified."""
+    """Create an entity, refanging and auto-detecting type if not specified."""
+    value = refang(value)
     if entity_type is None:
         detected = detect_entity_type(value)
         if detected is None:
             raise ValueError(f"Cannot detect entity type for: {value}")
         entity_type = detected
-    return Entity(type=entity_type, value=value.strip(), **kwargs)
+    return Entity(type=entity_type, value=value, **kwargs)

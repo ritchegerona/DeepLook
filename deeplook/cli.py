@@ -16,6 +16,7 @@ from deeplook.core.attack_mapping import AttackReport, annotate_entities, map_wo
 from deeplook.core.cache import ResultCache
 from deeplook.core.entity import ENTITY_COLORS, EntityType, create_entity
 from deeplook.core.graph import IntelGraph
+from deeplook.core.ingest import IngestResult, ingest_file
 from deeplook.core.pivot import PivotEngine, PivotResult
 from deeplook.core.plugin_loader import get_plugins_for_entity, load_all_plugins
 from deeplook.core.workspace import Workspace
@@ -810,6 +811,31 @@ def attack(
         )
 
 
+@app.command()
+def ingest(
+    file: str = typer.Option(..., "-f", "--file", help="Feed file to ingest"),
+    workspace: str = typer.Option(None, "-w", "--workspace", help="Workspace name"),
+    file_format: str = typer.Option("auto", "--format", help="Format: auto, text, csv, stix, misp"),
+    tags: str = typer.Option(None, "--tags", help="Comma-separated tags to apply to ingested indicators"),
+    output_format: str = typer.Option("table", "--output-format", help="Output format: table, json"),
+) -> None:
+    """Ingest IOC feeds (plain/defanged text, CSV, STIX 2.1, MISP) into a workspace."""
+    path = Path(file)
+    if not path.exists():
+        console.print(f"[red]File not found: {path}[/red]")
+        raise typer.Exit(code=1)
+
+    ws = get_workspace(workspace)
+    tag_list = [t.strip() for t in tags.split(",") if t.strip()] if tags else None
+
+    result = ingest_file(ws, path, fmt=file_format, tags=tag_list)
+
+    if output_format == "json":
+        console.print(json.dumps(result.to_dict(), indent=2))
+    else:
+        _print_ingest_summary(result)
+
+
 # --- Helpers ---
 
 
@@ -836,6 +862,32 @@ def _print_attack_report(report: AttackReport, scope: str) -> None:
     )
     if report.unmapped:
         console.print(f"[dim]{len(report.unmapped)} entities had no ATT&CK mapping.[/dim]")
+
+
+def _print_ingest_summary(result: IngestResult) -> None:
+    console.print(Panel(f"[bold]Ingested:[/bold] {result.source} ({result.format})", border_style="cyan"))
+
+    if result.samples:
+        table = Table(title="Indicators", expand=True)
+        table.add_column("Type", style="bold")
+        table.add_column("Value")
+        for sample in result.samples:
+            try:
+                entity_type: EntityType | None = EntityType(sample["type"])
+            except ValueError:
+                entity_type = None
+            table.add_row(Text(sample["type"], style=ENTITY_COLORS.get(entity_type, "white")), sample["value"])
+        console.print(table)
+
+    console.print(
+        f"[bold]Added:[/bold] {result.added}  "
+        f"[bold]Skipped:[/bold] {result.skipped}  "
+        f"[bold]Total:[/bold] {result.total}"
+    )
+    for error in result.errors[:10]:
+        console.print(f"[yellow]warning:[/yellow] {error}")
+    if len(result.errors) > 10:
+        console.print(f"[dim]... and {len(result.errors) - 10} more warnings[/dim]")
 
 
 def _print_pivot_summary(result: PivotResult) -> None:

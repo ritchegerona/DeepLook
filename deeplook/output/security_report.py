@@ -8,7 +8,6 @@ from rich.table import Table
 from rich.text import Text
 
 from deeplook.core.security_scorer import (
-    Finding,
     FindingStatus,
     RiskLevel,
     SecurityReport,
@@ -51,7 +50,7 @@ def _render_header(report: SecurityReport) -> None:
     score_color = "green" if report.overall_score >= 80 else "yellow" if report.overall_score >= 60 else "red"
     header = Text()
     header.append(f"Target: {report.target}\n", style="bold cyan")
-    header.append(f"Overall Score: ", style="bold")
+    header.append("Overall Score: ", style="bold")
     header.append(f"{report.overall_score}/100", style=f"bold {score_color}")
     header.append(f" ({report.risk_emoji})\n", style=RISK_STYLES.get(report.risk_level, "white"))
     console.print(Panel(header, title="Security Assessment", border_style="cyan"))
@@ -86,7 +85,6 @@ def _render_findings(report: SecurityReport) -> None:
     for finding in sorted_findings:
         icon = STATUS_ICONS.get(finding.status, "?")
         style = STATUS_STYLES.get(finding.status, "white")
-        risk_style = RISK_STYLES.get(finding.risk, "white")
 
         line = Text()
         line.append(f"  [{icon}] ", style=style)
