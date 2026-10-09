@@ -87,12 +87,16 @@ pages = {
     ],
     "Analysis": [
         st.Page("pages/analysis/analyze.py", title="Analyze"),
+        st.Page("pages/analysis/pivot.py", title="Pivot"),
+        st.Page("pages/analysis/attack.py", title="ATT&CK"),
         st.Page("pages/analysis/security.py", title="Security"),
         st.Page("pages/analysis/graph.py", title="Graph"),
         st.Page("pages/analysis/correlate.py", title="Correlate"),
     ],
     "Management": [
         st.Page("pages/management/workspace.py", title="Workspace"),
+        st.Page("pages/management/ingest.py", title="Ingest"),
+        st.Page("pages/management/watchlist.py", title="Watchlist"),
         st.Page("pages/management/export.py", title="Export"),
         st.Page("pages/management/plugins.py", title="Plugins"),
         st.Page("pages/management/query.py", title="Query"),
