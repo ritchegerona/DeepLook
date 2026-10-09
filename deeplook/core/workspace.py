@@ -78,6 +78,17 @@ class Workspace:
                 plugin_count INTEGER DEFAULT 0,
                 entity_count INTEGER DEFAULT 0
             );
+            CREATE TABLE IF NOT EXISTS watchlist (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                type TEXT NOT NULL,
+                value TEXT NOT NULL,
+                tags TEXT DEFAULT '[]',
+                note TEXT DEFAULT '',
+                created_at TEXT NOT NULL,
+                last_checked TEXT,
+                last_result TEXT DEFAULT '{}',
+                UNIQUE(type, value)
+            );
             """
         )
         self.conn.commit()
@@ -205,6 +216,46 @@ class Workspace:
         rows = self.conn.execute("SELECT * FROM timeline ORDER BY timestamp").fetchall()
         return [dict(r) for r in rows]
 
+    def add_watch(self, entity_type: str, value: str, tags: list[str] | None = None, note: str = "") -> int:
+        cursor = self.conn.execute(
+            """
+            INSERT OR IGNORE INTO watchlist (type, value, tags, note, created_at)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (entity_type, value, json.dumps(tags or []), note, datetime.now(UTC).isoformat()),
+        )
+        self.conn.commit()
+        if cursor.rowcount == 0:
+            row = self.conn.execute(
+                "SELECT id FROM watchlist WHERE type = ? AND value = ?", (entity_type, value)
+            ).fetchone()
+            return row["id"] if row else 0
+        return cursor.lastrowid or 0
+
+    def remove_watch(self, watch_id: int) -> bool:
+        cursor = self.conn.execute("DELETE FROM watchlist WHERE id = ?", (watch_id,))
+        self.conn.commit()
+        return cursor.rowcount > 0
+
+    def get_watch(self, watch_id: int) -> dict[str, Any] | None:
+        row = self.conn.execute("SELECT * FROM watchlist WHERE id = ?", (watch_id,)).fetchone()
+        return self._row_to_watch(row) if row else None
+
+    def find_watch_by_value(self, value: str) -> dict[str, Any] | None:
+        row = self.conn.execute("SELECT * FROM watchlist WHERE LOWER(value) = LOWER(?)", (value,)).fetchone()
+        return self._row_to_watch(row) if row else None
+
+    def list_watch(self) -> list[dict[str, Any]]:
+        rows = self.conn.execute("SELECT * FROM watchlist ORDER BY created_at").fetchall()
+        return [self._row_to_watch(r) for r in rows]
+
+    def update_watch_check(self, watch_id: int, snapshot: dict[str, Any]) -> None:
+        self.conn.execute(
+            "UPDATE watchlist SET last_checked = ?, last_result = ? WHERE id = ?",
+            (datetime.now(UTC).isoformat(), json.dumps(snapshot), watch_id),
+        )
+        self.conn.commit()
+
     def log_scan(self, command: str, targets: list[str], plugin_count: int = 0) -> int:
         cursor = self.conn.execute(
             "INSERT INTO scan_history (command, targets, started_at, plugin_count) VALUES (?, ?, ?, ?)",
@@ -267,6 +318,18 @@ class Workspace:
                 entry.queried_at = datetime.fromisoformat(p["queried_at"])
             entity.provenance.append(entry)
         return entity
+
+    def _row_to_watch(self, row: sqlite3.Row) -> dict[str, Any]:
+        return {
+            "id": row["id"],
+            "type": row["type"],
+            "value": row["value"],
+            "tags": json.loads(row["tags"]),
+            "note": row["note"],
+            "created_at": row["created_at"],
+            "last_checked": row["last_checked"],
+            "last_result": json.loads(row["last_result"] or "{}"),
+        }
 
     def _row_to_edge(self, row: sqlite3.Row) -> Edge:
         edge = Edge(

@@ -19,6 +19,7 @@ from deeplook.core.graph import IntelGraph
 from deeplook.core.ingest import IngestResult, ingest_file
 from deeplook.core.pivot import PivotEngine, PivotResult
 from deeplook.core.plugin_loader import get_plugins_for_entity, load_all_plugins
+from deeplook.core.watchlist import WatchCheckResult, WatchlistEngine
 from deeplook.core.workspace import Workspace
 from deeplook.output.correlation import correlate
 from deeplook.output.csv_export import export_csv
@@ -836,6 +837,72 @@ def ingest(
         _print_ingest_summary(result)
 
 
+@app.command("watch")
+def watch_cmd(
+    action: str = typer.Argument(help="Action: add, list, remove, check"),
+    value: str = typer.Argument(None, help="Indicator (add) or watch id (remove/check)"),
+    workspace: str = typer.Option(None, "-w", "--workspace", help="Workspace name"),
+    tags: str = typer.Option(None, "--tags", help="Comma-separated tags (add)"),
+    note: str = typer.Option("", "--note", help="Note (add)"),
+    output_format: str = typer.Option("table", "--output-format", help="Output format: table, json"),
+) -> None:
+    """Manage the watchlist and check watched indicators for changes."""
+    ws = get_workspace(workspace)
+
+    if action == "add":
+        if not value:
+            console.print("[red]Provide an indicator value to watch.[/red]")
+            raise typer.Exit(1)
+        try:
+            entity = create_entity(value)
+        except ValueError as exc:
+            console.print(f"[red]{exc}[/red]")
+            raise typer.Exit(1) from exc
+        tag_list = [t.strip() for t in tags.split(",") if t.strip()] if tags else []
+        watch_id = ws.add_watch(entity.type.value, entity.value, tags=tag_list, note=note)
+        console.print(f"[green]Watching {entity.type.value} '{entity.value}' (id {watch_id}).[/green]")
+
+    elif action == "list":
+        items = ws.list_watch()
+        if output_format == "json":
+            console.print(json.dumps(items, indent=2))
+        elif not items:
+            console.print("[dim]Watchlist is empty.[/dim]")
+        else:
+            _print_watchlist(items)
+
+    elif action == "remove":
+        if not value or not value.isdigit():
+            console.print("[red]Provide the watch id to remove.[/red]")
+            raise typer.Exit(1)
+        if ws.remove_watch(int(value)):
+            console.print(f"[green]Removed watch {value}.[/green]")
+        else:
+            console.print(f"[red]No watch with id {value}.[/red]")
+
+    elif action == "check":
+        if not ws.list_watch():
+            console.print("[dim]Watchlist is empty.[/dim]")
+            return
+        engine = WatchlistEngine(ws)
+        if value and value.isdigit():
+            watch = ws.get_watch(int(value))
+            if not watch:
+                console.print(f"[red]No watch with id {value}.[/red]")
+                raise typer.Exit(1)
+            results = [engine.check(watch)]
+        else:
+            results = engine.check_all()
+        if output_format == "json":
+            console.print(json.dumps([r.to_dict() for r in results], indent=2))
+        else:
+            _print_watch_results(results)
+
+    else:
+        console.print(f"[red]Unknown action: {action} (use add, list, remove, check).[/red]")
+        raise typer.Exit(1)
+
+
 # --- Helpers ---
 
 
@@ -888,6 +955,45 @@ def _print_ingest_summary(result: IngestResult) -> None:
         console.print(f"[yellow]warning:[/yellow] {error}")
     if len(result.errors) > 10:
         console.print(f"[dim]... and {len(result.errors) - 10} more warnings[/dim]")
+
+
+def _print_watchlist(items: list[dict]) -> None:
+    table = Table(title="Watchlist", show_lines=True, expand=True)
+    table.add_column("ID", justify="right", style="bold")
+    table.add_column("Type")
+    table.add_column("Value")
+    table.add_column("Tags")
+    table.add_column("Last Checked")
+
+    for item in items:
+        try:
+            entity_type: EntityType | None = EntityType(item["type"])
+        except ValueError:
+            entity_type = None
+        table.add_row(
+            str(item["id"]),
+            Text(item["type"], style=ENTITY_COLORS.get(entity_type, "white")),
+            item["value"],
+            ", ".join(item["tags"]) or "-",
+            item["last_checked"] or "never",
+        )
+    console.print(table)
+
+
+def _print_watch_results(results: list[WatchCheckResult]) -> None:
+    total = sum(len(r.changes) for r in results)
+    console.print(Panel(f"[bold]Watchlist check:[/bold] {len(results)} items, {total} changes", border_style="cyan"))
+
+    for result in results:
+        if result.error:
+            console.print(f"[yellow]{result.item.value}:[/yellow] {result.error}")
+        for change in result.changes:
+            color = "green" if change.change == "added" else "red"
+            sign = "+" if change.change == "added" else "-"
+            console.print(f"  [{color}]{sign}[/{color}] {change.detail}")
+
+    if not total:
+        console.print("[dim]No changes detected.[/dim]")
 
 
 def _print_pivot_summary(result: PivotResult) -> None:
