@@ -12,6 +12,7 @@ from rich.table import Table
 from rich.text import Text
 
 from deeplook import __version__
+from deeplook.core.attack_mapping import AttackReport, annotate_entities, map_workspace
 from deeplook.core.cache import ResultCache
 from deeplook.core.entity import ENTITY_COLORS, EntityType, create_entity
 from deeplook.core.graph import IntelGraph
@@ -770,7 +771,71 @@ def pivot(
         _do_export(ws, export, export_path or f"deeplook-pivot-{target}.{export}")
 
 
+@app.command()
+def attack(
+    target: str = typer.Argument(None, help="Target to scope to (optional; default: whole workspace)"),
+    workspace: str = typer.Option(None, "-w", "--workspace", help="Workspace name"),
+    annotate: bool = typer.Option(False, "--annotate", help="Persist technique IDs into entity metadata"),
+    output_format: str = typer.Option("table", "-f", "--format", help="Output format: table, json"),
+) -> None:
+    """Map findings to MITRE ATT&CK (Reconnaissance / Resource Development)."""
+    ws = get_workspace(workspace)
+
+    entities = None
+    scope = ws.name
+    if target:
+        graph = ws.to_graph()
+        center = graph.find_entity(target)
+        if center is None:
+            console.print(f"[yellow]'{target}' not found in workspace; mapping entire workspace.[/yellow]")
+        else:
+            entities = [center]
+            seen = {center.id}
+            for neighbor, _ in graph.get_neighbors(center.id):
+                if neighbor.id not in seen:
+                    seen.add(neighbor.id)
+                    entities.append(neighbor)
+            scope = target
+
+    report = annotate_entities(ws, entities) if annotate else map_workspace(ws, entities)
+
+    if output_format == "json":
+        console.print(json.dumps(report.to_dict(), indent=2))
+    else:
+        _print_attack_report(report, scope)
+
+    if annotate:
+        console.print(
+            f"[green]Annotated {report.entity_count - len(report.unmapped)} entities with ATT&CK IDs.[/green]"
+        )
+
+
 # --- Helpers ---
+
+
+def _print_attack_report(report: AttackReport, scope: str) -> None:
+    table = Table(title=f"ATT&CK Coverage — {scope}", show_lines=True, expand=True)
+    table.add_column("Technique", style="bold cyan")
+    table.add_column("Name")
+    table.add_column("Tactic", style="magenta")
+    table.add_column("Entities", justify="right")
+
+    for usage in report.techniques:
+        table.add_row(
+            usage.technique.id,
+            usage.technique.name,
+            usage.technique.tactic,
+            str(len(usage.entities)),
+        )
+    console.print(table)
+
+    console.print(
+        f"[bold]{len(report.techniques)} techniques[/bold] across "
+        f"[bold]{report.entity_count}[/bold] entities "
+        f"({', '.join(report.tactics) if report.tactics else 'none'})"
+    )
+    if report.unmapped:
+        console.print(f"[dim]{len(report.unmapped)} entities had no ATT&CK mapping.[/dim]")
 
 
 def _print_pivot_summary(result: PivotResult) -> None:

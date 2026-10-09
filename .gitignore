@@ -19,7 +19,7 @@ env/
 .coverage
 htmlcov/
 *.log
-output/
-reports/
+/output/
+/reports/
 .deeplook/
 .DS_Store
