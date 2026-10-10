@@ -456,6 +456,8 @@ deeplook watch <action> [value] [OPTIONS]
 | `--tags` | | Comma-separated tags (add) |
 | `--note` | | Note (add) |
 | `--output-format` | | Output format: `table`, `json` |
+| `--report` | | Append a JSON-lines run log to this file (check) |
+| `--fail-on-change` | | Exit 2 if any changes are detected (check) |
 | `--workspace` | `-w` | Workspace name |
 
 **Examples:**
@@ -465,7 +467,12 @@ deeplook watch list -w case-001
 deeplook watch check -w case-001
 deeplook watch check 2 -w case-001
 deeplook watch remove 2 -w case-001
+deeplook watch check -w case-001 --report ~/.deeplook/watch-runs.jsonl
+deeplook watch check -w case-001 --fail-on-change
 ```
+
+See [SCHEDULING.md](SCHEDULING.md) for running checks on a schedule (cron,
+launchd, systemd).
 
 ---
 

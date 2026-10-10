@@ -27,7 +27,7 @@ DeepLook maps to the **CTIA Intelligence Lifecycle**: it automates the *collecti
 - **Auto-pivot**: Recursively expand an indicator breadth-first to discover related infrastructure
 - **MITRE ATT&CK mapping**: Map plugins and entities to ATT&CK techniques and export coverage
 - **IOC ingestion**: Import text/CSV/STIX 2.1/MISP feeds with automatic defang/refang
-- **Watchlist monitoring**: Track indicators and diff newly discovered (or vanished) entities over time
+- **Watchlist monitoring**: Track indicators and diff newly discovered (or vanished) entities over time, with scheduled runs (`--report`, `--fail-on-change`)
 
 ### Export & Reporting
 - **CSV**: Universal, spreadsheet-compatible
