@@ -62,6 +62,7 @@ gui = [
 dev = [
     "pytest>=7.4",
     "pytest-asyncio>=0.23",
+    "pytest-cov>=5.0",
     "ruff>=0.3.0",
     "responses>=0.24",
 ]
@@ -88,3 +89,21 @@ select = ["E", "F", "I", "N", "W", "UP"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
+
+[tool.coverage.run]
+source = ["deeplook"]
+branch = true
+omit = [
+    "deeplook/gui/*",
+    "deeplook/__main__.py",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+fail_under = 34
+exclude_lines = [
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+]
