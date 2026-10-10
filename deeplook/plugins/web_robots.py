@@ -79,7 +79,7 @@ class WebRobotsPlugin(OSINTPlugin):
             entity.add_tag("robots-parsed")
             workspace.add_entity(entity)
             result.add_entity(entity)
-            result.raw_data = resp.text
+            result.raw_data = {"robots_txt": resp.text}
 
         except requests.RequestException as e:
             entity.metadata["robots"] = {"error": str(e)}

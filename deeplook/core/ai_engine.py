@@ -15,16 +15,17 @@ class AIEngine:
     """Optional LLM-powered analysis engine."""
 
     def __init__(self) -> None:
-        self.api_key = os.environ.get("OPENAI_API_KEY") or os.environ.get("ANTHROPIC_API_KEY")
+        self.api_key: str = os.environ.get("OPENAI_API_KEY") or os.environ.get("ANTHROPIC_API_KEY") or ""
         self.provider = "openai" if os.environ.get("OPENAI_API_KEY") else "anthropic"
         self.available = bool(self.api_key)
 
     def _call_openai(self, prompt: str, max_tokens: int = 2000) -> str | None:
         try:
+            api_key = self.api_key or ""
             resp = requests.post(
                 "https://api.openai.com/v1/chat/completions",
                 headers={
-                    "Authorization": f"Bearer {self.api_key}",
+                    "Authorization": f"Bearer {api_key}",
                     "Content-Type": "application/json",
                 },
                 json={
@@ -41,10 +42,11 @@ class AIEngine:
 
     def _call_anthropic(self, prompt: str, max_tokens: int = 2000) -> str | None:
         try:
+            api_key = self.api_key
             resp = requests.post(
                 "https://api.anthropic.com/v1/messages",
                 headers={
-                    "x-api-key": self.api_key,
+                    "x-api-key": api_key,
                     "anthropic-version": "2023-06-01",
                     "Content-Type": "application/json",
                 },
@@ -138,7 +140,7 @@ Provide a clear, factual answer based on the data above."""
         notes = workspace.get_notes()
         timeline = workspace.get_timeline()
 
-        entity_summary = {}
+        entity_summary: dict[str, list[dict[str, Any]]] = {}
         for e in entities:
             etype = e.type.value
             if etype not in entity_summary:

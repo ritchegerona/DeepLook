@@ -15,7 +15,7 @@ class IntelGraph:
     """Directed graph of entities and their relationships."""
 
     def __init__(self) -> None:
-        self._graph = nx.DiGraph()
+        self._graph: nx.DiGraph = nx.DiGraph()
         self._entities: dict[str, Entity] = {}
         self._edges: dict[str, Edge] = {}
 
@@ -87,7 +87,7 @@ class IntelGraph:
 
     def communities(self) -> list[set[str]]:
         undirected = self._graph.to_undirected()
-        return [c for c in nx.community.greedy_modularity_communities(undirected)]
+        return [set(c) for c in nx.community.greedy_modularity_communities(undirected)]
 
     @property
     def entity_count(self) -> int:
@@ -156,7 +156,7 @@ class IntelGraph:
         text.append("│ Center: ", style="dim")
         text.append(f"{center.value}\n\n", style=f"bold {color}")
 
-        visited = set()
+        visited: set[str] = set()
         self._render_node(text, center_id, 0, max_depth, visited, prefix="  ", is_last=True)
 
         return text

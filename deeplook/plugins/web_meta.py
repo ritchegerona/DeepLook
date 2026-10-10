@@ -36,29 +36,29 @@ class WebMetaPlugin(OSINTPlugin):
             title = ""
             title_tag = soup.find("title")
             if title_tag and title_tag.string:
-                title = title_tag.string.strip()
+                title = str(title_tag.string).strip()
 
             meta_desc = ""
             desc_tag = soup.find("meta", attrs={"name": "description"})
             if desc_tag:
-                meta_desc = desc_tag.get("content", "")
+                meta_desc = str(desc_tag.get("content", ""))
 
             og: dict[str, str] = {}
             for attr in ("og:title", "og:description", "og:image", "og:type", "og:url"):
                 tag = soup.find("meta", attrs={"property": attr})
                 if tag:
-                    og[attr] = tag.get("content", "")
+                    og[attr] = str(tag.get("content", ""))
 
             twitter: dict[str, str] = {}
             for attr in ("twitter:card", "twitter:title", "twitter:description", "twitter:image"):
                 tag = soup.find("meta", attrs={"name": attr})
                 if tag:
-                    twitter[attr] = tag.get("content", "")
+                    twitter[attr] = str(tag.get("content", ""))
 
             favicon = ""
             link_tag = soup.find("link", attrs={"rel": "icon"}) or soup.find("link", attrs={"rel": "shortcut icon"})
             if link_tag:
-                favicon = link_tag.get("href", "")
+                favicon = str(link_tag.get("href", ""))
 
             entity.metadata["meta"] = {
                 "title": title,

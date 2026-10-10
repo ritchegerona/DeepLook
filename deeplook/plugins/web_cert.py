@@ -83,19 +83,21 @@ class WebCert(OSINTPlugin):
             result.add_warning(f"Certificate inspection failed for {entity.value}: {e}")
             return result
 
-        subject = dict(x[0] for x in cert.get("subject", ()))
-        issuer = dict(x[0] for x in cert.get("issuer", ()))
-        not_before = cert.get("notBefore", "")
-        not_after = cert.get("notAfter", "")
+        subject = dict(x[0] for x in cert.get("subject", ()))  # type: ignore[misc, union-attr]
+        issuer = dict(x[0] for x in cert.get("issuer", ()))  # type: ignore[misc, union-attr]
+        not_before = cert.get("notBefore", "")  # type: ignore[union-attr]
+        not_after = cert.get("notAfter", "")  # type: ignore[union-attr]
 
         san_list = []
-        for san_type, san_value in cert.get("subjectAltName", ()):
-            san_list.append(san_value)
+        for san_entry in cert.get("subjectAltName", ()):  # type: ignore[union-attr]
+            if isinstance(san_entry, tuple) and len(san_entry) == 2:
+                san_type, san_value = san_entry
+                san_list.append(san_value)
 
         issuer_org = issuer.get("organizationName", "Unknown")
         is_self_signed = subject == issuer
         is_expired = False
-        not_after_dt = _parse_cert_date(not_after)
+        not_after_dt = _parse_cert_date(str(not_after))
         if not_after_dt and not_after_dt < datetime.now(UTC):
             is_expired = True
 
@@ -105,11 +107,11 @@ class WebCert(OSINTPlugin):
             "subject": dict(subject),
             "issuer": dict(issuer),
             "issuer_org": issuer_org,
-            "serial_number": cert.get("serialNumber", ""),
+            "serial_number": cert.get("serialNumber", "") if cert else "",
             "not_before": not_before,
             "not_after": not_after,
             "san": san_list,
-            "version": cert.get("version", ""),
+            "version": cert.get("version", "") if cert else "",
             "is_expired": is_expired,
             "is_self_signed": is_self_signed,
             "known_ca": known_ca,

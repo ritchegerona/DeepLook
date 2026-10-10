@@ -500,7 +500,7 @@ def plugins_cmd(
 
     elif action == "info" and name:
         plugin = all_plugins.get(name)
-        if plugin:
+        if plugin is not None:
             info = plugin.info()
             console.print(Panel(json.dumps(info, indent=2), title=f"Plugin: {name}"))
         else:
@@ -963,7 +963,8 @@ def _print_ingest_summary(result: IngestResult) -> None:
                 entity_type: EntityType | None = EntityType(sample["type"])
             except ValueError:
                 entity_type = None
-            table.add_row(Text(sample["type"], style=ENTITY_COLORS.get(entity_type, "white")), sample["value"])
+            color = ENTITY_COLORS.get(entity_type, "white") if entity_type else "white"
+            table.add_row(Text(sample["type"], style=color), sample["value"])
         console.print(table)
 
     console.print(
@@ -990,9 +991,10 @@ def _print_watchlist(items: list[dict]) -> None:
             entity_type: EntityType | None = EntityType(item["type"])
         except ValueError:
             entity_type = None
+        color = ENTITY_COLORS.get(entity_type, "white") if entity_type else "white"
         table.add_row(
             str(item["id"]),
-            Text(item["type"], style=ENTITY_COLORS.get(entity_type, "white")),
+            Text(item["type"], style=color),
             item["value"],
             ", ".join(item["tags"]) or "-",
             item["last_checked"] or "never",
@@ -1028,7 +1030,7 @@ def _print_pivot_summary(result: PivotResult) -> None:
             entity_type: EntityType | None = EntityType(node.type)
         except ValueError:
             entity_type = None
-        color = ENTITY_COLORS.get(entity_type, "white")
+        color = ENTITY_COLORS.get(entity_type, "white") if entity_type else "white"
         table.add_row(
             str(node.depth),
             Text(node.type, style=color),
@@ -1076,16 +1078,16 @@ def _do_export(ws: Workspace, fmt: str, path: str, report: str = "full") -> None
     out = Path(path)
     if fmt == "csv":
         result = export_csv(ws, out)
-        console.print(f"[green]Exported CSV to {result}[/green]")
+        console.print(f"[green]Exported CSV to {str(result)}[/green]")
     elif fmt == "xlsx":
         result = export_xlsx(ws, out, report)
-        console.print(f"[green]Exported Excel to {result}[/green]")
+        console.print(f"[green]Exported Excel to {str(result)}[/green]")
     elif fmt == "json":
         result = export_json(ws, out)
-        console.print(f"[green]Exported JSON to {result}[/green]")
+        console.print(f"[green]Exported JSON to {str(result)}[/green]")
     elif fmt == "stix":
         result = export_stix(ws, out)
-        console.print(f"[green]Exported STIX to {result}[/green]")
+        console.print(f"[green]Exported STIX to {str(result)}[/green]")
     else:
         console.print(f"[red]Unknown format: {fmt}[/red]")
 

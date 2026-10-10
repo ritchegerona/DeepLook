@@ -114,10 +114,10 @@ def _find_certificate_overlap(workspace: Workspace) -> list[dict[str, Any]]:
         for edge in workspace.all_edges():
             if edge.relationship == RelationshipType.CERT_ISSUED_TO:
                 tgt = entity_map.get(edge.target_id)
-                if tgt and tgt.type in (EntityType.DOMAIN, EntityType.SUBDOMAIN):
-                    for cert in certs:
-                        if edge.source_id == cert["cert_id"]:
-                            cert_domains[cert["value"]].append(tgt.value)
+                if tgt is not None and tgt.type in (EntityType.DOMAIN, EntityType.SUBDOMAIN):
+                    for cert_dict in certs:
+                        if edge.source_id == cert_dict["cert_id"]:
+                            cert_domains[cert_dict["value"]].append(tgt.value)
 
         domains = set()
         for domain_list in cert_domains.values():

@@ -101,5 +101,5 @@ class WebRedirectsPlugin(OSINTPlugin):
                 workspace.add_edge(edge)
                 result.add_edge(edge)
 
-        result.raw_data = chain
+        result.raw_data = {"redirect_chain": chain}
         return result

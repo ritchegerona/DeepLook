@@ -81,7 +81,8 @@ class SSLVuln(OSINTPlugin):
             result.add_warning(f"SSL vulnerability check failed for {entity.value}: {e}")
             return result
 
-        if protocol_version in WEAK_PROTOCOLS or any(p in protocol_version for p in WEAK_PROTOCOLS):
+        proto = protocol_version or ""
+        if proto in WEAK_PROTOCOLS or any(p in proto for p in WEAK_PROTOCOLS):
             findings.append(
                 Finding(
                     category="SSL/TLS Security",
@@ -105,7 +106,7 @@ class SSLVuln(OSINTPlugin):
                 )
             )
 
-        is_weak_cipher, weak_type = _check_weak_ciphers(protocol_version, cipher_name)
+        is_weak_cipher, weak_type = _check_weak_ciphers(proto, cipher_name)
         if is_weak_cipher:
             findings.append(
                 Finding(
@@ -131,8 +132,8 @@ class SSLVuln(OSINTPlugin):
             )
 
         if cert:
-            not_after = cert.get("notAfter", "")
-            not_after_dt = _parse_cert_date(not_after) if not_after else None
+            not_after = cert.get("notAfter", "")  # type: ignore[union-attr]
+            not_after_dt = _parse_cert_date(str(not_after)) if not_after else None
             if not_after_dt and not_after_dt < datetime.now(UTC):
                 findings.append(
                     Finding(
@@ -157,8 +158,8 @@ class SSLVuln(OSINTPlugin):
                     )
                 )
 
-            subject = dict(x[0] for x in cert.get("subject", ()))
-            issuer = dict(x[0] for x in cert.get("issuer", ()))
+            subject = dict(x[0] for x in cert.get("subject", ()))  # type: ignore[misc, union-attr]
+            issuer = dict(x[0] for x in cert.get("issuer", ()))  # type: ignore[misc, union-attr]
             if subject == issuer:
                 findings.append(
                     Finding(

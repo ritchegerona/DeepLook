@@ -94,6 +94,8 @@ def _write_row(ws, row_idx: int, values: list) -> None:
 
 def _build_summary_sheet(wb: Workbook, ws_obj: Workspace) -> None:
     ws = wb.active
+    if ws is None:
+        return
     ws.title = "Summary"
     entities = ws_obj.all_entities()
     edges = ws_obj.all_edges()
@@ -126,6 +128,8 @@ def _build_summary_sheet(wb: Workbook, ws_obj: Workspace) -> None:
 
 def _build_entities_sheet(wb: Workbook, ws_obj: Workspace) -> None:
     ws = wb.create_sheet("Entities")
+    if ws is None:
+        return
     ws.append(["ID", "Type", "Value", "Confidence", "First Seen", "Last Seen", "Tags", "Notes"])
     _style_header_row(ws)
 
@@ -153,6 +157,8 @@ def _build_entities_sheet(wb: Workbook, ws_obj: Workspace) -> None:
 
 def _build_relationships_sheet(wb: Workbook, ws_obj: Workspace) -> None:
     ws = wb.create_sheet("Relationships")
+    if ws is None:
+        return
     ws.append(
         [
             "Source ID",
@@ -191,6 +197,8 @@ def _build_relationships_sheet(wb: Workbook, ws_obj: Workspace) -> None:
 
 def _build_domain_details_sheet(wb: Workbook, ws_obj: Workspace) -> None:
     ws = wb.create_sheet("Domain Details")
+    if ws is None:
+        return
     ws.append(["Domain", "Registrar", "Created", "Expires", "Name Servers", "Confidence"])
     _style_header_row(ws)
 
@@ -216,6 +224,8 @@ def _build_domain_details_sheet(wb: Workbook, ws_obj: Workspace) -> None:
 
 def _build_ip_details_sheet(wb: Workbook, ws_obj: Workspace) -> None:
     ws = wb.create_sheet("IP Details")
+    if ws is None:
+        return
     ws.append(["IP", "ASN", "Organization", "Country", "ISP", "Confidence"])
     _style_header_row(ws)
 
@@ -241,6 +251,8 @@ def _build_ip_details_sheet(wb: Workbook, ws_obj: Workspace) -> None:
 
 def _build_username_results_sheet(wb: Workbook, ws_obj: Workspace) -> None:
     ws = wb.create_sheet("Username Results")
+    if ws is None:
+        return
     ws.append(["Username", "Platform", "URL", "Status", "Confidence"])
     _style_header_row(ws)
 
@@ -271,6 +283,8 @@ def _build_username_results_sheet(wb: Workbook, ws_obj: Workspace) -> None:
 
 def _build_email_analysis_sheet(wb: Workbook, ws_obj: Workspace) -> None:
     ws = wb.create_sheet("Email Analysis")
+    if ws is None:
+        return
     ws.append(["Email", "Valid", "Disposable", "Provider", "Confidence"])
     _style_header_row(ws)
 
@@ -295,6 +309,8 @@ def _build_email_analysis_sheet(wb: Workbook, ws_obj: Workspace) -> None:
 
 def _build_iocs_sheet(wb: Workbook, ws_obj: Workspace) -> None:
     ws = wb.create_sheet("IOCs")
+    if ws is None:
+        return
     ws.append(["Type", "Value", "Confidence", "First Seen", "Tags"])
     _style_header_row(ws)
 
@@ -327,6 +343,8 @@ def _build_iocs_sheet(wb: Workbook, ws_obj: Workspace) -> None:
 
 def _build_correlation_sheet(wb: Workbook, ws_obj: Workspace) -> None:
     ws = wb.create_sheet("Correlation")
+    if ws is None:
+        return
     ws.append(["Type", "Finding", "Entities Involved"])
     _style_header_row(ws)
 
@@ -384,6 +402,8 @@ def _build_correlation_sheet(wb: Workbook, ws_obj: Workspace) -> None:
 
 def _build_attack_sheet(wb: Workbook, ws_obj: Workspace) -> None:
     ws = wb.create_sheet("ATT&CK")
+    if ws is None:
+        return
     ws.append(["Technique ID", "Technique", "Tactic", "Entities", "URL"])
     _style_header_row(ws)
 
@@ -407,6 +427,8 @@ def _build_attack_sheet(wb: Workbook, ws_obj: Workspace) -> None:
 
 def _build_timeline_sheet(wb: Workbook, ws_obj: Workspace) -> None:
     ws = wb.create_sheet("Timeline")
+    if ws is None:
+        return
     ws.append(["Timestamp", "Event", "Target", "Details"])
     _style_header_row(ws)
 
@@ -428,6 +450,8 @@ def _build_timeline_sheet(wb: Workbook, ws_obj: Workspace) -> None:
 
 def _build_notes_sheet(wb: Workbook, ws_obj: Workspace) -> None:
     ws = wb.create_sheet("Notes")
+    if ws is None:
+        return
     ws.append(["ID", "Entity ID", "Content", "Created At"])
     _style_header_row(ws)
 
@@ -449,6 +473,8 @@ def _build_notes_sheet(wb: Workbook, ws_obj: Workspace) -> None:
 
 def _build_watchlist_sheet(wb: Workbook, ws_obj: Workspace) -> None:
     ws = wb.create_sheet("Watchlist")
+    if ws is None:
+        return
     ws.append(["ID", "Type", "Value", "Tags", "Added", "Last Checked", "Tracked Entities", "Note"])
     _style_header_row(ws)
 
@@ -476,6 +502,8 @@ def _build_watchlist_sheet(wb: Workbook, ws_obj: Workspace) -> None:
 
 def _build_ingestion_sheet(wb: Workbook, ws_obj: Workspace) -> None:
     ws = wb.create_sheet("Ingestion")
+    if ws is None:
+        return
     ws.append(["Type", "Value", "Feed", "Confidence", "First Seen", "Tags"])
     _style_header_row(ws)
 
@@ -556,7 +584,9 @@ def export_xlsx(workspace: Workspace, output_path: Path, report: str = "full") -
         builder = _SHEET_BUILDERS.get(sheet_name)
         if builder:
             if sheet_name == "Summary":
-                wb.active.title = sheet_name
+                ws = wb.active
+                if ws is not None:
+                    ws.title = sheet_name
             builder(wb, workspace)
 
     if "Summary" not in sheets and wb.sheetnames:

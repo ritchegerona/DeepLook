@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import whois
+import whois  # type: ignore[import-untyped]
 
 from deeplook.core.edge import Edge, RelationshipType
 from deeplook.core.entity import Entity, EntityType

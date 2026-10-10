@@ -95,7 +95,7 @@ class WebTech(OSINTPlugin):
 
     def run(self, entity: Entity, workspace: Workspace) -> PluginResult:
         result = PluginResult()
-        tech_stack: dict[str, list[str]] = {}
+        tech_stack: dict[str, dict[str, list[str]]] = {}
 
         for scheme in ["https", "http"]:
             url = f"{scheme}://{entity.value}"
@@ -112,7 +112,7 @@ class WebTech(OSINTPlugin):
 
                 soup = BeautifulSoup(body_text, "html.parser")
                 generator_tag = soup.find("meta", attrs={"name": "generator"})
-                generator_content = generator_tag.get("content", "") if generator_tag else ""
+                generator_content: str = str(generator_tag.get("content", "")) if generator_tag else ""
 
                 detected: dict[str, list[str]] = {}
 

@@ -56,7 +56,7 @@ class WebEmails(OSINTPlugin):
         emails: set[str] = set()
 
         for a_tag in soup.find_all("a", href=True):
-            href = a_tag["href"]
+            href = str(a_tag["href"])
             if href.lower().startswith("mailto:"):
                 email_part = href[7:].split("?")[0].strip()
                 if EMAIL_RE.match(email_part):

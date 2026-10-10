@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from stix2 import Bundle, Identity, Relationship
-from stix2.v21 import Indicator
+from stix2 import Bundle, Identity, Relationship  # type: ignore[import-untyped]
+from stix2.v21 import Indicator  # type: ignore[import-untyped]
 
 from deeplook.core.edge import Edge
 from deeplook.core.entity import Entity, EntityType

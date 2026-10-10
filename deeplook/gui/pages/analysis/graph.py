@@ -30,7 +30,7 @@ if show_btn or True:
 
     try:
         import streamlit.components.v1 as components
-        from pyvis.network import Network
+        from pyvis.network import Network  # type: ignore[import-untyped]
 
         node_colors = {
             "domain": "#3b82f6",
