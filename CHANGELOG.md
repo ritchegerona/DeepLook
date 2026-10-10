@@ -20,6 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **IOC ingestion** (`deeplook ingest`) — parses plain text, CSV, STIX 2.x, and
   MISP feeds with automatic format detection, defang/refang, deduplication, tags,
   and ingestion provenance.
+- **RDAP plugin** (`domain-rdap`) — queries the RDAP JSON API (rdap.org) for
+  registrar, registration/expiration events, EPP statuses, and nameservers, and
+  populates the Domain Details report keys without clobbering WHOIS data.
 - **Indicator watchlist** (`deeplook watch`) — persistent watchlist with
   add/list/remove/check and change detection (snapshot diffing). `watch check`
   supports `--report` (JSON-lines run log) and `--fail-on-change` (exit 2) for
