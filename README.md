@@ -218,6 +218,8 @@ deeplook timeline
 | `deeplook note` | Add investigation note | `deeplook note "suspicious pattern"` |
 | `deeplook timeline` | View investigation timeline | `deeplook timeline` |
 | `deeplook search` | Search workspace | `deeplook search "example.com"` |
+| `deeplook ai <action>` | AI analysis (summarize/pivot/report/query) | `deeplook ai summarize` |
+| `deeplook gui` | Launch the Streamlit dashboard | `deeplook gui` |
 
 ---
 
