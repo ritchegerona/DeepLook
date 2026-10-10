@@ -21,7 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   MISP feeds with automatic format detection, defang/refang, deduplication, tags,
   and ingestion provenance.
 - **Indicator watchlist** (`deeplook watch`) — persistent watchlist with
-  add/list/remove/check and change detection (snapshot diffing).
+  add/list/remove/check and change detection (snapshot diffing). `watch check`
+  supports `--report` (JSON-lines run log) and `--fail-on-change` (exit 2) for
+  unattended/scheduled monitoring; see `docs/SCHEDULING.md` for cron, launchd,
+  and systemd examples.
 - **GUI pages** — Pivot, ATT&CK, Ingest, Watchlist, and AI pages for full CLI
   parity.
 - **Monitoring reports** — new `Watchlist` and `Ingestion` Excel sheets and a

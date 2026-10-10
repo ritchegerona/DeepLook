@@ -1,0 +1,11 @@
+# DeepLook watchlist monitoring — example crontab entries.
+#
+# Install with:  crontab -e
+# Adjust the absolute path to your DeepLook venv. Cron has a minimal PATH,
+# so always invoke the venv's deeplook binary by full path.
+
+# Every hour: check the watchlist and append a JSON-lines run record.
+0 * * * * /path/to/DeepLook/.venv/bin/deeplook watch check -w default --report "$HOME/.deeplook/watch-runs.jsonl" >> "$HOME/.deeplook/watch.cron.log" 2>&1
+
+# Every 15 minutes: alert (exit 2) when something changed, else stay quiet.
+*/15 * * * * /path/to/DeepLook/.venv/bin/deeplook watch check -w default --fail-on-change >/dev/null 2>&1 || echo "DeepLook watchlist changed at $(date)" >> "$HOME/.deeplook/watch.alerts.log"

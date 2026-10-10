@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from datetime import UTC, date, datetime
 from pathlib import Path
 
 import typer
@@ -376,7 +377,7 @@ def scan(
     if export:
         out_dir = Path(export_dir or ".")
         out_dir.mkdir(parents=True, exist_ok=True)
-        _do_export(ws, export, str(out_dir / f"scan-{__import__('datetime').date.today()}.{export}"))
+        _do_export(ws, export, str(out_dir / f"scan-{date.today()}.{export}"))
 
 
 @app.command()
@@ -846,6 +847,8 @@ def watch_cmd(
     tags: str = typer.Option(None, "--tags", help="Comma-separated tags (add)"),
     note: str = typer.Option("", "--note", help="Note (add)"),
     output_format: str = typer.Option("table", "--output-format", help="Output format: table, json"),
+    report: str = typer.Option(None, "--report", help="Append a JSON-lines run log to this file (check)"),
+    fail_on_change: bool = typer.Option(False, "--fail-on-change", help="Exit 2 if any changes are detected (check)"),
 ) -> None:
     """Manage the watchlist and check watched indicators for changes."""
     ws = get_workspace(workspace)
@@ -898,6 +901,22 @@ def watch_cmd(
             console.print(json.dumps([r.to_dict() for r in results], indent=2))
         else:
             _print_watch_results(results)
+
+        if report:
+            report_path = Path(report)
+            report_path.parent.mkdir(parents=True, exist_ok=True)
+            entry = {
+                "checked_at": results[0].checked_at if results else datetime.now(UTC).isoformat(),
+                "workspace": ws.name,
+                "changes": sum(len(r.changes) for r in results),
+                "results": [r.to_dict() for r in results],
+            }
+            with report_path.open("a", encoding="utf-8") as fh:
+                fh.write(json.dumps(entry) + "\n")
+            console.print(f"[dim]Logged run to {report_path}[/dim]")
+
+        if fail_on_change and any(r.has_changes for r in results):
+            raise typer.Exit(2)
 
     else:
         console.print(f"[red]Unknown action: {action} (use add, list, remove, check).[/red]")

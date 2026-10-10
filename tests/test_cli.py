@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import json
+
 import pytest
 from typer.testing import CliRunner
 
 from deeplook.cli import app
 from deeplook.core.entity import create_entity
+from deeplook.core.watchlist import WatchChange, WatchCheckResult, WatchItem
 from deeplook.core.workspace import Workspace
 
 
@@ -91,3 +94,52 @@ def test_cli_ai_unknown_action(runner):
     result = runner.invoke(app, ["ai", "bogus"])
 
     assert result.exit_code == 1
+
+
+def test_cli_watch_check_writes_report_and_fails_on_change(runner, tmp_path, monkeypatch):
+    assert runner.invoke(app, ["watch", "add", "evil.example"]).exit_code == 0
+
+    class _StubEngine:
+        def __init__(self, workspace):
+            self.workspace = workspace
+
+        def check_all(self):
+            return [
+                WatchCheckResult(
+                    item=WatchItem(id=1, type="domain", value="evil.example"),
+                    checked_at="2026-01-01T00:00:00+00:00",
+                    changes=[WatchChange(1, "evil.example", "added", "entity", "ip:1.2.3.4")],
+                )
+            ]
+
+    monkeypatch.setattr("deeplook.cli.WatchlistEngine", _StubEngine)
+
+    report = tmp_path / "runs.jsonl"
+    result = runner.invoke(app, ["watch", "check", "--report", str(report), "--fail-on-change"])
+
+    assert result.exit_code == 2
+    record = json.loads(report.read_text().strip())
+    assert record["changes"] == 1
+    assert record["workspace"] == "default"
+
+
+def test_cli_watch_check_no_change_exits_zero(runner, tmp_path, monkeypatch):
+    assert runner.invoke(app, ["watch", "add", "clean.example"]).exit_code == 0
+
+    class _StubEngine:
+        def __init__(self, workspace):
+            self.workspace = workspace
+
+        def check_all(self):
+            return [
+                WatchCheckResult(
+                    item=WatchItem(id=1, type="domain", value="clean.example"),
+                    checked_at="2026-01-01T00:00:00+00:00",
+                )
+            ]
+
+    monkeypatch.setattr("deeplook.cli.WatchlistEngine", _StubEngine)
+
+    result = runner.invoke(app, ["watch", "check", "--fail-on-change"])
+
+    assert result.exit_code == 0

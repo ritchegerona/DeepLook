@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  DeepLook watchlist monitoring agent (template).
+
+  Install:
+    cp examples/deeplook-watch.plist ~/Library/LaunchAgents/com.deeplook.watch.plist
+    # replace __USER__ and the venv path below, then:
+    launchctl load ~/Library/LaunchAgents/com.deeplook.watch.plist
+
+  Runs every StartInterval seconds (here: 1 hour) and once at load.
+  See docs/SCHEDULING.md for details.
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.deeplook.watch</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/__USER__/Development/DeepLook/.venv/bin/deeplook</string>
+        <string>watch</string>
+        <string>check</string>
+        <string>-w</string>
+        <string>default</string>
+        <string>--report</string>
+        <string>/Users/__USER__/.deeplook/watch-runs.jsonl</string>
+    </array>
+
+    <key>StartInterval</key>
+    <integer>3600</integer>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/Users/__USER__/.deeplook/watch.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/__USER__/.deeplook/watch.err</string>
+</dict>
+</plist>
