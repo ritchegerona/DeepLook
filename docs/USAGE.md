@@ -639,6 +639,14 @@ deeplook ai <action> [OPTIONS]
 - `summarize` — Summarize current findings
 - `pivot` — Suggest next investigation steps
 - `report` — Generate investigation report draft
+- `query` — Answer a natural-language question (use `-q`)
+
+**Options:**
+| Option | Short | Description |
+|--------|-------|-------------|
+| `--question` | `-q` | Question (for the `query` action) |
+| `--output` | `-o` | Write the result to a file |
+| `--workspace` | `-w` | Workspace name |
 
 **Environment variables:**
 - `OPENAI_API_KEY` — OpenAI API key
@@ -648,7 +656,8 @@ deeplook ai <action> [OPTIONS]
 ```bash
 deeplook ai summarize
 deeplook ai pivot -w investigation-001
-deeplook ai report
+deeplook ai report -o report-draft.md
+deeplook ai query -q "which indicators share infrastructure?"
 ```
 
 ---

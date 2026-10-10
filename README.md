@@ -328,6 +328,7 @@ Then use:
 deeplook ai summarize    # Summarize findings
 deeplook ai pivot        # Suggest next steps
 deeplook ai report       # Generate report draft
+deeplook ai query -q "which indicators share infrastructure?"
 ```
 
 Without an API key, AI features gracefully degrade with a helpful message.
