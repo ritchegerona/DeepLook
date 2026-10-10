@@ -104,6 +104,8 @@ def _build_summary_sheet(wb: Workbook, ws_obj: Workspace) -> None:
         "Total Entities": len(entities),
         "Total Relationships": len(edges),
         "Total Notes": len(notes),
+        "Watched Indicators": len(ws_obj.list_watch()),
+        "Ingested Indicators": sum(1 for e in entities if "ingested" in e.tags),
     }
 
     type_counts: dict[str, int] = {}
@@ -445,6 +447,62 @@ def _build_notes_sheet(wb: Workbook, ws_obj: Workspace) -> None:
     _auto_size_columns(ws)
 
 
+def _build_watchlist_sheet(wb: Workbook, ws_obj: Workspace) -> None:
+    ws = wb.create_sheet("Watchlist")
+    ws.append(["ID", "Type", "Value", "Tags", "Added", "Last Checked", "Tracked Entities", "Note"])
+    _style_header_row(ws)
+
+    for i, item in enumerate(ws_obj.list_watch(), 2):
+        last_result = item.get("last_result") or {}
+        tracked = len(last_result.get("entities", []))
+        _write_row(
+            ws,
+            i,
+            [
+                item.get("id", ""),
+                item.get("type", ""),
+                item.get("value", ""),
+                ", ".join(item.get("tags", [])),
+                item.get("created_at", ""),
+                item.get("last_checked") or "never",
+                tracked,
+                item.get("note", ""),
+            ],
+        )
+
+    _auto_filter_and_freeze(ws)
+    _auto_size_columns(ws)
+
+
+def _build_ingestion_sheet(wb: Workbook, ws_obj: Workspace) -> None:
+    ws = wb.create_sheet("Ingestion")
+    ws.append(["Type", "Value", "Feed", "Confidence", "First Seen", "Tags"])
+    _style_header_row(ws)
+
+    row_idx = 2
+    for entity in ws_obj.all_entities():
+        if "ingested" not in entity.tags:
+            continue
+        sources = sorted({p.source.split(":", 1)[1] for p in entity.provenance if p.source.startswith("ingest:")})
+        _write_row(
+            ws,
+            row_idx,
+            [
+                entity.type.value,
+                entity.value,
+                ", ".join(sources),
+                entity.confidence,
+                entity.first_seen.isoformat(),
+                ", ".join(entity.tags),
+            ],
+        )
+        row_idx += 1
+
+    _apply_confidence_conditional(ws, "D")
+    _auto_filter_and_freeze(ws)
+    _auto_size_columns(ws)
+
+
 _SHEET_BUILDERS = {
     "Summary": _build_summary_sheet,
     "Entities": _build_entities_sheet,
@@ -456,6 +514,8 @@ _SHEET_BUILDERS = {
     "IOCs": _build_iocs_sheet,
     "Correlation": _build_correlation_sheet,
     "ATT&CK": _build_attack_sheet,
+    "Watchlist": _build_watchlist_sheet,
+    "Ingestion": _build_ingestion_sheet,
     "Timeline": _build_timeline_sheet,
     "Notes": _build_notes_sheet,
 }
@@ -471,6 +531,8 @@ _FULL_REPORT_SHEETS = [
     "IOCs",
     "Correlation",
     "ATT&CK",
+    "Watchlist",
+    "Ingestion",
     "Timeline",
     "Notes",
 ]
@@ -481,6 +543,8 @@ _REPORT_SHEET_MAP: dict[str, list[str]] = {
     "technical": _FULL_REPORT_SHEETS,
     "ioc": ["IOCs"],
     "attack": ["Summary", "ATT&CK"],
+    "monitoring": ["Summary", "Watchlist", "Ingestion", "IOCs", "ATT&CK", "Timeline"],
+    "watchlist": ["Watchlist"],
 }
 
 

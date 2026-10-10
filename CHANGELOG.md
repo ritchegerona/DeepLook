@@ -24,6 +24,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   add/list/remove/check and change detection (snapshot diffing).
 - **GUI pages** — Pivot, ATT&CK, Ingest, Watchlist, and AI pages for full CLI
   parity.
+- **Monitoring reports** — new `Watchlist` and `Ingestion` Excel sheets and a
+  `monitoring` report template; the Summary sheet now counts watched and
+  ingested indicators, and full/technical exports include the new sheets.
 - **Test suite** — expanded from 52 to 99 tests, including CLI smoke tests via
   Typer's `CliRunner`.
 - **Automation** — GitHub Actions CI (lint, format check, tests with a coverage

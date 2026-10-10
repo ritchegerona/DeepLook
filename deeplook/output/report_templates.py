@@ -71,6 +71,8 @@ _TEMPLATES: dict[str, ReportTemplate] = {
             "IOCs",
             "Correlation",
             "ATT&CK",
+            "Watchlist",
+            "Ingestion",
             "Timeline",
             "Notes",
         ],
@@ -121,6 +123,13 @@ _TEMPLATES: dict[str, ReportTemplate] = {
         ],
         columns=_ALL_ENTITY_COLUMNS,
         sheets=["Summary", "Entities", "Domain Details", "IP Details", "Correlation", "ATT&CK"],
+    ),
+    "monitoring": ReportTemplate(
+        name="monitoring",
+        description="Watchlist and ingestion monitoring report with tracked indicators",
+        entity_types=_IOC_ENTITY_TYPES,
+        columns=_ALL_ENTITY_COLUMNS,
+        sheets=["Summary", "Watchlist", "Ingestion", "IOCs", "ATT&CK", "Timeline"],
     ),
     "custom": ReportTemplate(
         name="custom",
