@@ -64,6 +64,13 @@ class Edge:
     source_plugin: str = ""
     metadata: dict[str, Any] = field(default_factory=dict)
 
+    def __post_init__(self) -> None:
+        # Confidence is stored on a 0-100 scale. Plugins historically passed either
+        # fractions (0.0-1.0, e.g. 0.8) or percentages (e.g. 80.0), so normalize
+        # fractions up to keep the stored/rendered value consistent.
+        if 0 < self.confidence <= 1:
+            self.confidence = round(self.confidence * 100, 1)
+
     @property
     def label(self) -> str:
         return RELATIONSHIP_LABELS.get(self.relationship, self.relationship.value)

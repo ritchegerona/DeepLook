@@ -40,6 +40,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Confidence is normalized to a single 0–100 scale: entity/edge values passed
+  as fractions (e.g. `0.8`) now render as `80%` instead of `1%`, and values
+  already stored on the old fractional scale are repaired when loaded.
 - `.gitignore` no longer excludes the `deeplook/output/` package (pattern
   narrowed to `/output/` and `/reports/`).
 - Lint cleanup in `deeplook/output/security_report.py` (unused imports, f-string,

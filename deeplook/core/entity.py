@@ -62,6 +62,12 @@ class Entity:
     tags: list[str] = field(default_factory=list)
     metadata: dict[str, Any] = field(default_factory=dict)
 
+    def __post_init__(self) -> None:
+        # Confidence is stored on a 0-100 scale. Accept fractions (0.0-1.0) from
+        # callers and normalize them up so stored/rendered values stay consistent.
+        if 0 < self.confidence <= 1:
+            self.confidence = round(self.confidence * 100, 1)
+
     def add_provenance(self, source: str, confidence: float = 1.0, raw_data: dict[str, Any] | None = None) -> None:
         self.provenance.append(ProvenanceEntry(source=source, confidence=confidence, raw_data=raw_data))
         self.last_seen = datetime.now(UTC)

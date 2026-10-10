@@ -51,6 +51,10 @@ class TestEntity:
         assert entity.type == EntityType.IP
         assert entity.value == "8.8.8.8"
 
+    def test_fractional_confidence_is_normalized(self):
+        entity = Entity(type=EntityType.DOMAIN, value="example.com", confidence=0.75)
+        assert entity.confidence == 75.0
+
     def test_add_provenance(self):
         entity = Entity(type=EntityType.DOMAIN, value="example.com")
         entity.add_provenance("test-plugin", confidence=0.9)

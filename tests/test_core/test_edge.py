@@ -23,6 +23,32 @@ class TestEdge:
         )
         assert edge.label == "resolves to"
 
+    def test_fractional_confidence_is_normalized(self):
+        edge = Edge(
+            source_id="src-1",
+            target_id="tgt-1",
+            relationship=RelationshipType.RESOLVES_TO,
+            confidence=0.8,
+        )
+        assert edge.confidence == 80.0
+
+    def test_default_and_percentage_confidence_unchanged(self):
+        default = Edge(source_id="a", target_id="b", relationship=RelationshipType.RESOLVES_TO)
+        assert default.confidence == 100.0
+        pct = Edge(source_id="a", target_id="b", relationship=RelationshipType.RESOLVES_TO, confidence=85.0)
+        assert pct.confidence == 85.0
+
+    def test_from_dict_normalizes_legacy_fraction(self):
+        edge = Edge.from_dict(
+            {
+                "source_id": "a",
+                "target_id": "b",
+                "relationship": "resolves_to",
+                "confidence": 0.7,
+            }
+        )
+        assert edge.confidence == 70.0
+
     def test_to_dict(self):
         edge = Edge(
             source_id="src-1",
