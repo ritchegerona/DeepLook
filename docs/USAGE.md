@@ -53,7 +53,7 @@ Investigate a domain (WHOIS, DNS, subdomains, web profiling).
 deeplook domain <target> [OPTIONS]
 ```
 
-**Plugins run:** `domain-whois`, `domain-dns`, `domain-subdomain`, `domain-web`, `web-tech`, `web-headers`, `web-cert`, `web-links`, `web-emails`, `web-sitemap`, `web-robots`, `web-redirects`, `web-meta`, `web-dns-extra`, `crtsh`
+**Plugins run:** `domain-whois`, `domain-rdap`, `domain-dns`, `domain-subdomain`, `domain-web`, `web-tech`, `web-headers`, `web-cert`, `web-links`, `web-emails`, `web-sitemap`, `web-robots`, `web-redirects`, `web-meta`, `web-dns-extra`, `crtsh`
 
 **Options:**
 | Option | Short | Description |

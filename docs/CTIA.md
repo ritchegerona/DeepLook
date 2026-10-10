@@ -11,7 +11,7 @@ DeepLook automates the **Collection** and **Processing** stages of the Intellige
 | Lifecycle Stage | DeepLook Feature | Commands |
 |-----------------|------------------|----------|
 | **Planning & Direction** | Workspace management, investigation notes | `workspace new`, `note` |
-| **Collection** | 38+ passive OSINT plugins, IOC feed ingestion | `domain`, `ip`, `email`, `username`, `website`, `scan`, `ingest` |
+| **Collection** | 39+ passive OSINT plugins, IOC feed ingestion | `domain`, `ip`, `email`, `username`, `website`, `scan`, `ingest` |
 | **Processing** | Entity normalization, defang/refang, graph construction, caching | `analyze`, `ingest`, `graph` |
 | **Analysis** | Correlation engine, recursive auto-pivot, ATT&CK mapping, security assessment, watchlist monitoring | `correlate`, `pivot`, `attack`, `watch`, `query`, `security` |
 | **Dissemination** | Export to CSV/Excel/JSON/STIX, report templates incl. ATT&CK | `export`, `attack`, `ai report` |
@@ -24,7 +24,7 @@ DeepLook automates the **Collection** and **Processing** stages of the Intellige
 ### Module 1: Introduction to Threat Intelligence
 
 DeepLook provides hands-on practice with:
-- **OSINT collection** via 38+ plugins
+- **OSINT collection** via 39+ plugins
 - **Indicator types**: Domains, IPs, emails, usernames, hashes, BTC wallets
 - **Source validation**: Each result includes provenance tracking
 - **Security assessment**: Vulnerability scanning, breach detection, misconfiguration checks

@@ -18,7 +18,7 @@ DeepLook maps to the **CTIA Intelligence Lifecycle**: it automates the *collecti
 
 ### Core Capabilities
 - **7 entity types**: Domain, IP, Email, Username, Phone, Hash, BTC wallet
-- **38+ plugins**: WHOIS, DNS, geolocation, tech fingerprinting, username enumeration, breach checks, certificate transparency, security assessment, and more
+- **39+ plugins**: WHOIS/RDAP, DNS, geolocation, Shodan InternetDB, tech fingerprinting, username enumeration, breach checks, certificate transparency, security assessment, and more
 - **Graph visualization**: ASCII/Unicode entity relationship graphs in terminal
 - **Bulk scanning**: Scan hundreds of targets from a file with parallel execution
 - **Deep website profiling**: Tech stack, headers, certificates, emails, subdomains
@@ -225,11 +225,12 @@ deeplook timeline
 
 ## Plugin System
 
-### Built-in Plugins (38)
+### Built-in Plugins (39)
 
 | Plugin | Entity Type | Source | Key Required |
 |--------|-------------|--------|--------------|
-| `domain-whois` | Domain | RDAP/WHOIS | No |
+| `domain-whois` | Domain | WHOIS | No |
+| `domain-rdap` | Domain | RDAP (rdap.org) | No |
 | `domain-dns` | Domain | dnspython | No |
 | `domain-subdomain` | Domain | crt.sh | No |
 | `domain-web` | Domain | HTTP HEAD | No |
@@ -358,7 +359,7 @@ DeepLook stores configuration in `~/.deeplook/`:
 
 DeepLook maps to the EC-Council CTIA / Threat Intelligence Lifecycle:
 
-- **Collection**: All 38 plugins are passive, open-source collection modules, plus IOC feed ingestion (text/CSV/STIX/MISP)
+- **Collection**: All 39 plugins are passive, open-source collection modules, plus IOC feed ingestion (text/CSV/STIX/MISP)
 - **Processing**: `--json` and `--export` normalize indicators into structured records, with automatic defang/refang
 - **Analysis**: Graph visualization, correlation engine, recursive auto-pivot, MITRE ATT&CK coverage, watchlist monitoring
 - **Dissemination**: Report templates (Executive, Technical, IOC) ready for deliverables
