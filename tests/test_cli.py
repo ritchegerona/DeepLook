@@ -66,3 +66,28 @@ def test_cli_pivot_depth_zero(runner):
 
     assert result.exit_code == 0
     assert "Pivot from example.com" in result.output
+
+
+def test_cli_ai_graceful_without_key(runner, monkeypatch):
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+
+    result = runner.invoke(app, ["ai", "summarize"])
+
+    assert result.exit_code == 0
+    assert "unavailable" in result.output.lower()
+
+
+def test_cli_ai_query_requires_question(runner, monkeypatch):
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+
+    result = runner.invoke(app, ["ai", "query"])
+
+    assert result.exit_code == 1
+
+
+def test_cli_ai_unknown_action(runner):
+    result = runner.invoke(app, ["ai", "bogus"])
+
+    assert result.exit_code == 1

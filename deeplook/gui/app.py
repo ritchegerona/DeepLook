@@ -92,6 +92,7 @@ pages = {
         st.Page("pages/analysis/security.py", title="Security"),
         st.Page("pages/analysis/graph.py", title="Graph"),
         st.Page("pages/analysis/correlate.py", title="Correlate"),
+        st.Page("pages/analysis/ai.py", title="AI"),
     ],
     "Management": [
         st.Page("pages/management/workspace.py", title="Workspace"),

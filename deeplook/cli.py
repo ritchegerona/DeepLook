@@ -12,6 +12,7 @@ from rich.table import Table
 from rich.text import Text
 
 from deeplook import __version__
+from deeplook.core.ai_engine import AIEngine
 from deeplook.core.attack_mapping import AttackReport, annotate_entities, map_workspace
 from deeplook.core.cache import ResultCache
 from deeplook.core.entity import ENTITY_COLORS, EntityType, create_entity
@@ -1068,6 +1069,39 @@ def _do_export(ws: Workspace, fmt: str, path: str, report: str = "full") -> None
         console.print(f"[green]Exported STIX to {result}[/green]")
     else:
         console.print(f"[red]Unknown format: {fmt}[/red]")
+
+
+@app.command("ai")
+def ai_cmd(
+    action: str = typer.Argument(help="Action: summarize, pivot, report, query"),
+    question: str = typer.Option(None, "-q", "--question", help="Question (for the query action)"),
+    workspace: str = typer.Option(None, "-w", "--workspace", help="Workspace name"),
+    output: str = typer.Option(None, "-o", "--output", help="Write the result to a file"),
+) -> None:
+    """AI-powered analysis (requires OPENAI_API_KEY or ANTHROPIC_API_KEY)."""
+    engine = AIEngine()
+    ws = get_workspace(workspace)
+
+    if action == "summarize":
+        result = engine.summarize(ws)
+    elif action == "pivot":
+        result = engine.suggest_pivots(ws)
+    elif action == "report":
+        result = engine.generate_report(ws)
+    elif action == "query":
+        if not question:
+            console.print("[red]Provide a question with -q/--question.[/red]")
+            raise typer.Exit(code=1)
+        result = engine.natural_query(ws, question)
+    else:
+        console.print(f"[red]Unknown action: {action} (use summarize, pivot, report, query).[/red]")
+        raise typer.Exit(code=1)
+
+    if output:
+        Path(output).write_text(result)
+        console.print(f"[green]Written to {output}[/green]")
+    else:
+        console.print(result)
 
 
 @app.command()
