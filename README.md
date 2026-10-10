@@ -31,7 +31,7 @@ DeepLook maps to the **CTIA Intelligence Lifecycle**: it automates the *collecti
 
 ### Export & Reporting
 - **CSV**: Universal, spreadsheet-compatible
-- **Excel**: 12-sheet formatted workbook with conditional formatting
+- **Excel**: 14-sheet formatted workbook with conditional formatting
 - **JSON**: Structured, machine-readable, TIP-compatible
 - **STIX 2.1**: Industry-standard threat intelligence format
 - **Report templates**: Executive, Technical, IOC, Phishing, Threat Actor, Infrastructure
@@ -285,7 +285,7 @@ deeplook export --format csv --output results.csv
 ```bash
 deeplook export --format xlsx --report technical --output report.xlsx
 ```
-Produces a 12-sheet workbook: Summary, Entities, Relationships, Domain Details, IP Details, Username Results, Email Analysis, IOCs, Correlation, ATT&CK, Timeline, Notes.
+Produces a 14-sheet workbook: Summary, Entities, Relationships, Domain Details, IP Details, Username Results, Email Analysis, IOCs, Correlation, ATT&CK, Watchlist, Ingestion, Timeline, Notes.
 
 ### JSON
 ```bash
@@ -312,6 +312,7 @@ OASIS STIX 2.1 bundle compatible with MISP, OpenCTI, and other TIPs.
 | `phishing` | Phishing investigation | Domain, Email, Website, IOCs |
 | `threat-actor` | Attribution focus | Username, Email, Correlation, Timeline |
 | `infrastructure` | Network/infra focus | IP, Domain, Certificates |
+| `monitoring` | Watchlist + ingestion monitoring | Summary, Watchlist, Ingestion, IOCs, ATT&CK, Timeline |
 
 ---
 

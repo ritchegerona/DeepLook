@@ -487,7 +487,7 @@ deeplook export [OPTIONS]
 | `--output` | `-o` | Output file path | |
 | `--workspace` | `-w` | Workspace name | |
 
-**Report templates:** `executive`, `technical`, `ioc`, `phishing`, `threat_actor`, `infrastructure`, `attack`, `custom`
+**Report templates:** `executive`, `technical`, `ioc`, `phishing`, `threat_actor`, `infrastructure`, `attack`, `monitoring`, `custom`
 
 **Examples:**
 ```bash
