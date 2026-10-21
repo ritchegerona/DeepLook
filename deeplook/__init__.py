@@ -1,4 +1,4 @@
 """DeepLook - Advanced Terminal OSINT & Threat Intelligence Framework."""
 
 __version__ = "1.0.0"
-__author__ = "Ritchie Gerona"
+__author__ = "Ritche Gerona"
